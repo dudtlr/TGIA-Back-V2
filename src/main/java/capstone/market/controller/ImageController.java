@@ -60,22 +60,22 @@ public class ImageController {
     }
 
     @PostMapping("/image/send_image")
-//    public List<String> uploadImages(List<MultipartFile> images) throws IOException {
+
     public String uploadImage(MultipartFile image) throws IOException {
-        // 파일 처리 작업 수행
-//        List<String> filenames = new ArrayList<>();
-//        List<UploadFile> uploadFiles = fileService.storeFiles(files);
+
         Image imageFile = fileService.storeFile(image);
         return imageFile.getImageFilename();
-//        List<Image> uploadFiles = fileService.storeFiles(image);
-//        for (Image uploadFile : uploadFiles) {
-//            filenames.add(uploadFile.getImageFilename());
-//        }
+
     }
 
     @ResponseBody
     @GetMapping("/images/{filename}")
-    public Resource downloadImage(@PathVariable String filename) throws MalformedURLException {
-        return new UrlResource("file:" + fileService.getFullPath(filename));
+    public String downloadImage(@PathVariable String filename) throws MalformedURLException {
+
+        System.out.println("이미지 url 보내기 성공!!!");
+        final UrlResource urlResource = new UrlResource("file:" + fileService.getFullPath(filename));
+        System.out.println(urlResource.toString());
+        return urlResource.toString();
     }
+
 }

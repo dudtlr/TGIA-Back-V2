@@ -68,9 +68,9 @@ public class FileService {
         String originalFilename = multipartFile.getOriginalFilename();
         String storeFileName = createStoreFileName(originalFilename);
         File file = new File(getFullPath(storeFileName));
-        File destinationFile = new File(getFullPathForDeepLearning("deeplearn.png"));
+        //File destinationFile = new File(getFullPathForDeepLearning("deeplearn.png"));
         multipartFile.transferTo(file);
-        Files.copy(file.toPath(), destinationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        //Files.copy(file.toPath(), destinationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
         // 이미지 파일명 저장
         Image image = new Image(storeFileName);

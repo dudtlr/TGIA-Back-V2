@@ -2,6 +2,8 @@ package capstone.market.initData;
 
 import capstone.market.bugigram.User;
 import capstone.market.bugigram.UserJpaRepository;
+import capstone.market.bugigram.UserPost;
+import capstone.market.bugigram.UserPostJpaRepository;
 import capstone.market.domain.*;
 import capstone.market.repository.*;
 import capstone.market.service.ChatService;
@@ -28,6 +30,9 @@ public class DataLoader {
     private PostService postService;
     @Autowired
     private MannerRepository mannerRepository;
+
+    @Autowired
+    private UserPostJpaRepository userPostJpaRepository;
     @Autowired
     private ImageRepository imageRepository;
     @Autowired
@@ -210,6 +215,47 @@ public class DataLoader {
         user1.setImageFilename(jysProfile.getImageFilename());
         userJpaRepository.save(user1);
 
+        UserPost userPost1 = new UserPost();
+        userPost1.setUser(user1);
+        userPost1.setPostImageFilename("70_j.jpg");
+        userPost1.setIntroTextField("향수 샀다~~ 예쁘죠??");
+        userPost1.setLikeTextField("좋아요 89개");
+
+        userPostJpaRepository.save(userPost1);
+
+        UserPost userPost2 = new UserPost();
+        userPost2.setUser(user1);
+        userPost2.setPostImageFilename("67_j.jpeg");
+        userPost2.setIntroTextField("오늘도 부기 토트백 !!~~");
+        userPost2.setLikeTextField("좋아요 122개");
+
+        userPostJpaRepository.save(userPost2);
+
+        UserPost userPost3 = new UserPost();
+        userPost3.setUser(user1);
+        userPost3.setPostImageFilename("55_j.jpg");
+        userPost3.setIntroTextField("아이패드 샀다~~ 부럽지 애들아??");
+        userPost3.setLikeTextField("좋아요 139개");
+
+        userPostJpaRepository.save(userPost3);
+
+        UserPost userPost4 = new UserPost();
+        userPost4.setUser(user1);
+        userPost4.setPostImageFilename("9_j.jpeg");
+        userPost4.setIntroTextField("오늘 전독시 책만 읽었다...ㅋㅋㅋㅋㅋ");
+        userPost4.setLikeTextField("좋아요 512개");
+
+        userPostJpaRepository.save(userPost4);
+
+        UserPost userPost5 = new UserPost();
+        userPost5.setUser(user1);
+        userPost5.setPostImageFilename("1_j.jpg");
+        userPost5.setIntroTextField("오늘도 스프링 공부!!");
+        userPost5.setLikeTextField("좋아요 39개");
+
+        userPostJpaRepository.save(userPost5);
+
+
         User user2 = new User();
         user2.setName("차은우");
         user2.setNickname("은우");
@@ -217,6 +263,16 @@ public class DataLoader {
         user2.setPassword("@Qwerqwer");
         user2.setImageFilename("jj1.webp");
         userJpaRepository.save(user2);
+
+        UserPost userPost6 = new UserPost();
+        userPost6.setUser(user2);
+        userPost6.setPostImageFilename("boggie1.png");
+        userPost6.setIntroTextField("부기 너무 귀여워!");
+        userPost6.setLikeTextField("좋아요 198개");
+
+        userPostJpaRepository.save(userPost6);
+
+
 
 
         User user3 = new User();
@@ -227,6 +283,16 @@ public class DataLoader {
         user3.setImageFilename("jj2.jpg");
         userJpaRepository.save(user3);
 
+        UserPost userPost7 = new UserPost();
+        userPost7.setUser(user3);
+        userPost7.setPostImageFilename("bugi.png");
+        userPost7.setIntroTextField("부기 인형 너무 귀여워!!!!!!");
+        userPost7.setLikeTextField("좋아요 1249개");
+
+        userPostJpaRepository.save(userPost7);
+
+
+
         User user4 = new User();
         user4.setName("정해인");
         user4.setNickname("해인");
@@ -234,6 +300,15 @@ public class DataLoader {
         user4.setPassword("@Qwerqwer");
         user4.setImageFilename("jj3.webp");
         userJpaRepository.save(user4);
+
+        UserPost userPost8 = new UserPost();
+        userPost8.setUser(user4);
+        userPost8.setPostImageFilename("elec3_1.jpeg");
+        userPost8.setIntroTextField("아이패드 샀다 애들아!!!!");
+        userPost8.setLikeTextField("좋아요 12개");
+
+        userPostJpaRepository.save(userPost8);
+
 
         User user5 = new User();
         user5.setName("이혜주");
@@ -243,6 +318,16 @@ public class DataLoader {
         user5.setImageFilename("jj4.png");
         userJpaRepository.save(user5);
 
+        UserPost userPost9 = new UserPost();
+        userPost9.setUser(user5);
+        userPost9.setPostImageFilename("brave_beauty_1_1.jpg");
+        userPost9.setIntroTextField("향수 이쁘지~~~~");
+        userPost9.setLikeTextField("좋아요 11232개");
+
+        userPostJpaRepository.save(userPost9);
+
+
+
         User user6 = new User();
         user6.setName("이주빈");
         user6.setNickname("주빈");
@@ -250,6 +335,16 @@ public class DataLoader {
         user6.setPassword("@Qwerqwer");
         user6.setImageFilename("jj5.jpg");
         userJpaRepository.save(user6);
+
+        UserPost userPost10 = new UserPost();
+        userPost10.setUser(user6);
+        userPost10.setPostImageFilename("brave_beauty_1_2.jpg");
+        userPost10.setIntroTextField("새 향수 개봉~~~~");
+        userPost10.setLikeTextField("좋아요 23232개");
+
+        userPostJpaRepository.save(userPost10);
+
+
 
         User user7 = new User();
         user7.setName("마리오");
@@ -259,6 +354,14 @@ public class DataLoader {
         user7.setImageFilename("jj6.jpg");
         userJpaRepository.save(user7);
 
+        UserPost userPost11 = new UserPost();
+        userPost11.setUser(user7);
+        userPost11.setPostImageFilename("brave_beauty_3_1.jpg");
+        userPost11.setIntroTextField("오늘 플렉스 했다~~ 내 시계 어때!!");
+        userPost11.setLikeTextField("좋아요 12개");
+
+        userPostJpaRepository.save(userPost11);
+
 
         User user8 = new User();
         user8.setName("곰돌이");
@@ -267,6 +370,15 @@ public class DataLoader {
         user8.setPassword("@Qwerqwer");
         user8.setImageFilename("jj7.jpeg");
         userJpaRepository.save(user8);
+
+        UserPost userPost12 = new UserPost();
+        userPost12.setUser(user8);
+        userPost12.setPostImageFilename("brave_book_3_1.jpg");
+        userPost12.setIntroTextField("오늘부터 공부....");
+        userPost12.setLikeTextField("좋아요 12개");
+
+        userPostJpaRepository.save(userPost12);
+
 
         User user9 = new User();
         user9.setName("김현수");

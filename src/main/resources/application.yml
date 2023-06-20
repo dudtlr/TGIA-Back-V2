@@ -1,9 +1,9 @@
 # 이미지를 저장시킬 백엔드 디렉토리
 
 
-#file.dir: /Users/son/Desktop/upload/
+file.dir: /Users/jys/Desktop/upload/
 
-file.dir: ./upload/
+#file.dir: ./upload/
 
 #file.dir: /home/ubuntu/uploads/
 #file.dir: /home/jys/uploads/
