@@ -94,6 +94,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 }
 
 
+
                 if (searchFilterDto.getDepartments() != null && !searchFilterDto.getDepartments().isEmpty()) {
                     BooleanExpression[] categoryExpressions3 = searchFilterDto.getDepartments().stream()
                             .map(post.departmentType::eq)
