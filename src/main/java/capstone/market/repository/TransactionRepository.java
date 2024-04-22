@@ -56,7 +56,7 @@ public class TransactionRepository {
      * 3. 총 포스트 갯수(카테고리별)  도서, 필기구, 생활가전, 패션패션의류, 전자기기, 부기굿즈, 뷰티미용
      */
     public Long getTotalPosts_도서(){
-        String jpql = "SELECT COUNT(p) FROM Post p WHERE p.category.category_type = :category";
+        String jpql = "SELECT COUNT(p) FROM Post p WHERE p.categoryType = :category";
 
         Long count = em.createQuery(jpql, Long.class)
                 .setParameter("category", CategoryType.도서)
@@ -65,7 +65,7 @@ public class TransactionRepository {
 
     }
     public Long getTotalPosts_필기구(){
-        String jpql = "SELECT COUNT(p) FROM Post p WHERE p.category.category_type = :category";
+        String jpql = "SELECT COUNT(p) FROM Post p WHERE p.categoryType = :category";
 
         Long count = em.createQuery(jpql, Long.class)
                 .setParameter("category", CategoryType.필기구)
@@ -74,7 +74,7 @@ public class TransactionRepository {
 
     }
     public Long getTotalPosts_생활가전(){
-        String jpql = "SELECT COUNT(p) FROM Post p WHERE p.category.category_type = :category";
+        String jpql = "SELECT COUNT(p) FROM Post p WHERE p.categoryType = :category";
 
         Long count = em.createQuery(jpql, Long.class)
                 .setParameter("category", CategoryType.생활가전)
@@ -83,7 +83,7 @@ public class TransactionRepository {
 
     }
     public Long getTotalPosts_패션의류(){
-        String jpql = "SELECT COUNT(p) FROM Post p WHERE p.category.category_type = :category";
+        String jpql = "SELECT COUNT(p) FROM Post p WHERE p.categoryType = :category";
 
         Long count = em.createQuery(jpql, Long.class)
                 .setParameter("category", CategoryType.패션의류)
@@ -92,7 +92,7 @@ public class TransactionRepository {
 
     }
     public Long getTotalPosts_전자기기(){
-        String jpql = "SELECT COUNT(p) FROM Post p WHERE p.category.category_type = :category";
+        String jpql = "SELECT COUNT(p) FROM Post p WHERE p.categoryType = :category";
 
         Long count = em.createQuery(jpql, Long.class)
                 .setParameter("category", CategoryType.전자기기)
@@ -101,7 +101,7 @@ public class TransactionRepository {
 
     }
     public Long getTotalPosts_부기굿즈(){
-        String jpql = "SELECT COUNT(p) FROM Post p WHERE p.category.category_type = :category";
+        String jpql = "SELECT COUNT(p) FROM Post p WHERE p.categoryType = :category";
 
         Long count = em.createQuery(jpql, Long.class)
                 .setParameter("category", CategoryType.부기굿즈)
@@ -110,7 +110,7 @@ public class TransactionRepository {
 
     }
     public Long getTotalPosts_뷰티미용(){
-        String jpql = "SELECT COUNT(p) FROM Post p WHERE p.category.category_type = :category";
+        String jpql = "SELECT COUNT(p) FROM Post p WHERE p.categoryType = :category";
 
         Long count = em.createQuery(jpql, Long.class)
                 .setParameter("category", CategoryType.뷰티미용)
@@ -126,7 +126,7 @@ public class TransactionRepository {
      */
 
     public Long getTotalTransactions_도서(){
-        String jpql = "SELECT COUNT(p) FROM Post p WHERE p.category.category_type = :category and p.purchased is not null";
+        String jpql = "SELECT COUNT(p) FROM Post p WHERE p.categoryType = :category and p.purchased is not null";
 
         Long count = em.createQuery(jpql, Long.class)
                 .setParameter("category", CategoryType.도서)
@@ -137,7 +137,7 @@ public class TransactionRepository {
 
 
     public Long getTotalTransactions_필기구(){
-        String jpql = "SELECT COUNT(p) FROM Post p WHERE p.category.category_type = :category and p.purchased is not null";
+        String jpql = "SELECT COUNT(p) FROM Post p WHERE p.categoryType = :category and p.purchased is not null";
 
         Long count = em.createQuery(jpql, Long.class)
                 .setParameter("category", CategoryType.필기구)
@@ -146,7 +146,7 @@ public class TransactionRepository {
 
     }
     public Long getTotalTransactions_생활가전(){
-        String jpql = "SELECT COUNT(p) FROM Post p WHERE p.category.category_type = :category and p.purchased is not null";
+        String jpql = "SELECT COUNT(p) FROM Post p WHERE p.categoryType = :category and p.purchased is not null";
 
         Long count = em.createQuery(jpql, Long.class)
                 .setParameter("category", CategoryType.생활가전)
@@ -155,7 +155,7 @@ public class TransactionRepository {
 
     }
     public Long getTotalTransactions_패션의류(){
-        String jpql = "SELECT COUNT(p) FROM Post p WHERE p.category.category_type = :category and p.purchased is not null";
+        String jpql = "SELECT COUNT(p) FROM Post p WHERE p.categoryType = :category and p.purchased is not null";
 
         Long count = em.createQuery(jpql, Long.class)
                 .setParameter("category", CategoryType.패션의류)
@@ -164,7 +164,7 @@ public class TransactionRepository {
 
     }
     public Long getTotalTransactions_전자기기(){
-        String jpql = "SELECT COUNT(p) FROM Post p WHERE p.category.category_type = :category and p.purchased is not null";
+        String jpql = "SELECT COUNT(p) FROM Post p WHERE p.categoryType = :category and p.purchased is not null";
 
         Long count = em.createQuery(jpql, Long.class)
                 .setParameter("category", CategoryType.전자기기)
@@ -173,7 +173,7 @@ public class TransactionRepository {
 
     }
     public Long getTotalTransactions_부기굿즈(){
-        String jpql = "SELECT COUNT(p) FROM Post p WHERE p.category.category_type = :category and p.purchased is not null";
+        String jpql = "SELECT COUNT(p) FROM Post p WHERE p.categoryType = :category and p.purchased is not null";
 
         Long count = em.createQuery(jpql, Long.class)
                 .setParameter("category", CategoryType.부기굿즈)
@@ -182,7 +182,7 @@ public class TransactionRepository {
 
     }
     public Long getTotalTransactions_뷰티미용(){
-        String jpql = "SELECT COUNT(p) FROM Post p WHERE p.category.category_type = :category and p.purchased is not null";
+        String jpql = "SELECT COUNT(p) FROM Post p WHERE p.categoryType = :category and p.purchased is not null";
 
         Long count = em.createQuery(jpql, Long.class)
                 .setParameter("category", CategoryType.뷰티미용)
@@ -299,7 +299,7 @@ public class TransactionRepository {
 
                 String jpql = "SELECT COUNT(p) " +
                         "FROM Post p " +
-                        "WHERE p.category.category_type = :category " +
+                        "WHERE p.categoryType = :category " +
                         "AND YEAR(p.createdDate) = :year " +
                         "AND MONTH(p.createdDate) = :month";
 
@@ -388,7 +388,7 @@ public class TransactionRepository {
 
                 String jpql = "SELECT COUNT(p) " +
                         "FROM Post p " +
-                        "WHERE p.category.category_type = :category and p.purchased is not null " +
+                        "WHERE p.categoryType = :category and p.purchased is not null " +
                         "AND YEAR(p.createdDate) = :year " +
                         "AND MONTH(p.createdDate) = :month";
 
@@ -426,7 +426,7 @@ public class TransactionRepository {
      */
 
     public Long getTotalTransactionsPriceByCategory(CategoryType category) {
-        String jpql = "SELECT SUM(p.price) FROM Post p WHERE p.category.category_type = :category and p.purchased is not null";
+        String jpql = "SELECT SUM(p.price) FROM Post p WHERE p.categoryType = :category and p.purchased is not null";
 
         Long totalAmount = em.createQuery(jpql, Long.class)
                 .setParameter("category", category)
