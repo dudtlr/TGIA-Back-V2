@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public class PostRepositoryCustomImpl implements PostRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
-
+        //테스트 확인용
             // 기존 기능(QueryDSL) + 페이징
             @Override
             public List<PostDetailDto> searchFilterWithPaging(SearchFilterDto searchFilterDto) {
@@ -114,6 +114,8 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                     } else {
                         order = post.createdDate.desc();
                     }
+
+
 
 
 
