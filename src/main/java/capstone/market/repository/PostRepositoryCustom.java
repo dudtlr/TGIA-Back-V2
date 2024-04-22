@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface PostRepositoryCustom {
 
-    List<PostDetailDto> searchFilter(SearchFilterDto searchFilterDto);
+    //List<PostDetailDto> searchFilter(SearchFilterDto searchFilterDto);
 
     List<PostDetailDto> searchFilterWithPaging(SearchFilterDto searchFilterDto);
 

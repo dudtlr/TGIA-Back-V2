@@ -76,41 +76,26 @@ public class PostService {
     }
     //@@@@@@@@@@@@@@@@@카테고리로 필터링@@@@@@@@@@@@@@@@@@@
 
-    //필터링 추가 3/23 @@@@@@@@ final version
-    public List<PostDetailDto> SearchFilter(SearchFilterDto searchFilterDto){
-
-        SearchKeyword searchKeyword = searchKeywordRepository.findByKeyword(searchFilterDto.getKeyword());
-        if (searchKeyword == null) {
-            searchKeyword = new SearchKeyword();
-            searchKeyword.setKeyword(searchFilterDto.getKeyword());
-            searchKeyword.setSearchCount(1L);
-        } else {
-            searchKeyword.setSearchCount(searchKeyword.getSearchCount() + 1);
-        }
-        searchKeywordRepository.save(searchKeyword);
-
-        return postDataJpaRepository.searchFilter(searchFilterDto);
-
-    }
 
     // QueryDSL + Paging
     public List<PostDetailDto> searchFilterWithPaging(SearchFilterDto searchFilterDto){
 
 
-        if(searchFilterDto.getYs() !=1) {
-            SearchKeyword searchKeyword = searchKeywordRepository.findByKeyword(searchFilterDto.getKeyword());
-            if (searchKeyword == null) {
-                searchKeyword = new SearchKeyword();
-                searchKeyword.setKeyword(searchFilterDto.getKeyword());
-                searchKeyword.setSearchCount(1L);
-            } else {
-                searchKeyword.setSearchCount(searchKeyword.getSearchCount() + 1);
-            }
-            searchKeywordRepository.save(searchKeyword);
-
-        }
+//        if(searchFilterDto.getYs() !=1) {
+//            SearchKeyword searchKeyword = searchKeywordRepository.findByKeyword(searchFilterDto.getKeyword());
+//            if (searchKeyword == null) {
+//                searchKeyword = new SearchKeyword();
+//                searchKeyword.setKeyword(searchFilterDto.getKeyword());
+//                searchKeyword.setSearchCount(1L);
+//            } else {
+//                searchKeyword.setSearchCount(searchKeyword.getSearchCount() + 1);
+//            }
+//            searchKeywordRepository.save(searchKeyword);
+//
+//        }
 
         return postDataJpaRepository.searchFilterWithPaging(searchFilterDto);
+
 
     }
 
@@ -173,7 +158,7 @@ public class PostService {
         post.setTrack(request.getTrack());
 //      postRepository.savePost(post);
         post.setStatus(request.getStatusType());
-        post.getDepartment().setDepartmentType(request.getDepartment());
+        post.setDepartmentType(request.getDepartment());
 
         if(request.getDepartment() == DepartmentType.컴퓨터공학부 ||
                 request.getDepartment() == DepartmentType.기계전자공학부 ||

@@ -23,14 +23,13 @@ public class SearchFilterDto {
     String sort;
     String keyword;
 
-
     List<DepartmentType> departments;
     TrackType track;
     CollegeType collegeType;
 
 
-    Integer page = 0;
-    Integer size = 50;
+    Integer page ;
+    Integer size = 20;
 
     Integer ys=7;
 

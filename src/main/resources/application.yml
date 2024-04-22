@@ -1,11 +1,11 @@
 # 이미지를 저장시킬 백엔드 디렉토리
 
 
-file.dir: /Users/jys/Desktop/upload/
+#file.dir: /Users/jys/Desktop/upload/
 
 #file.dir: ./upload/
 
-#file.dir: /home/ubuntu/uploads/
+file.dir: /home/ubuntu/uploads/
 #file.dir: /home/jys/uploads/
 deepLearnFile.dir: /Users/son/Downloads/yolov5-master/spring_sended/
 #file.dir: /home/ubuntu/upload/
@@ -20,12 +20,14 @@ spring:
     url: jdbc:mysql://localhost:3306/market_v0?serverTimezone=UTC&characterEncoding=UTF-8
     # market_v0: 스키마 이름
     username: root
-    password: 6091
+    password: 60916091
 
 
   jpa:
+    database: mysql   # 추가 해준 부분
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect # 추가 해준 부분
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
 #    properties:
 #      hibernate:
 #        # 얘도 sql 문을 보여주지만 sout 으로 하기 때문에 않좋다.
@@ -45,5 +47,12 @@ spring:
 
 
 server:
+  tomcat:
+    threads:
+      max: 100
+      min-spare: 50
+    max-connections: 8192
+    accept-count: 100
+    connection-timeout: 20000
   address: 0.0.0.0
   port: 8080

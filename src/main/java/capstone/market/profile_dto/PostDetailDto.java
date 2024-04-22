@@ -41,10 +41,10 @@ public class PostDetailDto{
         this.post_id = post.getPostId();
         this.title = post.getPost_title();
         this.member_id = post.getWho_posted().getId();
-        this.category = post.getCategory().getCategory_type();
+        this.category = post.getCategoryType();
         this.text = post.getPost_text();
         this.price = post.getPrice();
-        this.department = post.getDepartment().getDepartmentType();
+        this.department = post.getDepartmentType();
         this.views = post.getViews();
         this.likes = post.getLikes();
         this.locationType = post.getLocationType();

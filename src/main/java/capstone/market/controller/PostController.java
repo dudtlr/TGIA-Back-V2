@@ -43,15 +43,9 @@ public class PostController {
     private final SessionManager sessionManager;
     private final FileService fileService;
 
-    //@@@@@@@@@@@@@@@@@찐 필터링 구현@@@@@@@@@@@@@@@@@@@ 3월 23일
-    @PostMapping("/detailSearch")
-    public List<PostDetailDto> Search(@RequestBody SearchFilterDto searchFilterDto) {
 
-        List<PostDetailDto> postDetailDtos = postService.SearchFilter(searchFilterDto);
-        return postDetailDtos;
-    }
 
-    // QueryDsl + paging 미친 필터링 구현 완성!
+
     @PostMapping("/detailSearchWithPaging")
     public List<PostDetailDto> SearchWithPaging(@RequestBody SearchFilterDto searchFilterDto) {
 
@@ -125,36 +119,7 @@ public class PostController {
         return new PostForm(request);
     }
 
-//    @DeleteMapping("")
-//    //@GetMapping("/post/list")
-//    public List<Post> postListV3(HttpServletRequest request) {
-//        log.info("@GetMapping(\"/post/list\")");
-//        // 세션 관리자에 저장된 회원 정보 조회
-//        while (!SessionConst.POST_ENDED) {
-//            log.info("WHILE");
-//        }
-//
-//        log.info("BREAK");
-//
-//        HttpSession session = request.getSession(false);
-//
-//        if (session == null) {
-//            log.info("session error");
-//        }
-//
-//        Member member = (Member) session.getAttribute(SessionConst.LOGIN_MEMBER);
-//
-//        if (member == null) {
-//            log.info("login error");
-//        }
-//
-//        log.info("hello world" + member.getUser_id());
-//        List<Post> posts = postService.findPostByUserId(member.getUser_id());
-//        return posts;
-//    }
 
-    // @GetMapping("/post/list") // 2.17
-    // + 이미지 정보 추가 3월 17일
     public List<PostListResponse> postListV4(String user_id) {
         log.info("@GetMapping(\"/post/list\")");
 //        while(!SessionConst.POST_ENDED) {
@@ -225,22 +190,7 @@ public class PostController {
     }
 
 
-    //@@@@@@@@@@@@@@@@@@@@@@내가 판매 완료한 게시글 @@@@@@@@@@@@
 
-    //PostDetailResponse 이걸로 추후 바꿔야함 PostListResponse이거 대신에
-//    @GetMapping("/post/list") // 2.17
-//    public List<PostListResponse> postListV5(HttpServletRequest request) {
-//
-//        HttpSession session = request.getSession(false);
-//
-//        List<Post> posts = postService.findAll();
-//
-//        List<PostListResponse> result = posts.stream()
-//                .map(p -> new PostListResponse(p))
-//                .collect(Collectors.toList());
-//
-//        return result;
-//    }
 
     @GetMapping("/post/list_all") // 2.17
     public List<PostListResponse> postListV6() {
@@ -267,10 +217,10 @@ public class PostController {
         post.setPrice(request.getPrice());
         Category category = new Category();
         categoryService.UpdateCategory(category, request.getCategory());
-        post.setCategory(category);
+        post.setCategoryType(request.getCategory());
         Department department = new Department();
         departmentService.UpdateDepartment(department, request.getDepartment());
-        post.setDepartment(department);
+        post.setDepartmentType(request.getDepartment());
         post.setItem_name(request.getItem_name());
         System.out.println("requestadsfadfaf = " + request.getLocationType());
         post.setLocation_text(request.getLocation_text());
@@ -278,7 +228,7 @@ public class PostController {
         post.setStatus(StatusType.판매중);
 
         post.setTrack(request.getTrack());
-        post.getDepartment().setDepartmentType(request.getDepartment());
+        //post.getDepartment().setDepartmentType(request.getDepartment());
 
         if(request.getDepartment() == DepartmentType.컴퓨터공학부 ||
                 request.getDepartment() == DepartmentType.기계전자공학부 ||
@@ -386,20 +336,7 @@ public class PostController {
         return new PostDetailResponse(post);
     }
 
-    @GetMapping("/post/details3")
-    public PostAndSellerPostsDTO postDetailsUpgrade(@RequestParam Long postId, @RequestParam Long userId) {
-        Post post = postService.findPostByPostId(postId);
-        postService.increaseViewCount(postId,userId);
 
-        Member Seller = post.getWho_posted();
-        PostDetailDto postDetailDto = new PostDetailDto(post);
-        List<PostDetailDto> sellList = postService.findSellList(userId);
-        List<PostDetailDto> PostsByCategory = postService.findListByCategory(post.getCategory().getCategory_type());
-
-        return new PostAndSellerPostsDTO(postDetailDto,sellList,PostsByCategory);
-
-
-    }
 
 
     // hhhhhh

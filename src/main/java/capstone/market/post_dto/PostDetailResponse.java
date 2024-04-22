@@ -40,7 +40,7 @@ public class PostDetailResponse {
         this.title = post.getPost_title();
         this.member_id = post.getWho_posted().getId();
         this.writer = post.getWho_posted().getUsername();
-        this.category = post.getCategory().getCategory_type();
+        this.category = post.getCategoryType();
         this.text = post.getPost_text();
         this.price = post.getPrice();
         this.views = post.getViews();
