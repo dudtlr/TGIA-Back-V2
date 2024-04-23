@@ -21,6 +21,9 @@ spring:
     # market_v0: 스키마 이름
     username: root
     password: 60916091
+    redis:
+      host: localhost
+      port: 6379
 
 
   jpa:
