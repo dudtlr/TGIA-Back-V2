@@ -10,6 +10,7 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberPath;
+import com.querydsl.core.types.dsl.NumberTemplate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -18,11 +19,14 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.querydsl.core.types.dsl.Expressions.numberTemplate;
 
 @RequiredArgsConstructor
 @Data
@@ -67,22 +71,22 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                     whereBuilder.and(post.likes.goe(searchFilterDto.getLikes()));
                 }
 
-                //대소 문자 구분 x
-/*                if (searchFilterDto.getKeyword() != null && !searchFilterDto.getKeyword().isEmpty()) {
-                    whereBuilder.and(post.post_title.containsIgnoreCase(searchFilterDto.getKeyword())
-                            .or(post.post_text.containsIgnoreCase(searchFilterDto.getKeyword())));
-                }*/
-                //대소문자 구분
+
+
+//                if (searchFilterDto.getKeyword() != null && !searchFilterDto.getKeyword().isEmpty()) {
+//                    whereBuilder.and(post.post_title.contains(searchFilterDto.getKeyword())
+//                            .or(post.post_text.contains(searchFilterDto.getKeyword())));
+//                }
+
 
                 if (searchFilterDto.getKeyword() != null && !searchFilterDto.getKeyword().isEmpty()) {
-                    whereBuilder.and(post.post_title.contains(searchFilterDto.getKeyword())
-                            .or(post.post_text.contains(searchFilterDto.getKeyword())));
+
+                    NumberTemplate booleanTemplate= Expressions.numberTemplate(Double.class,
+                            "function('match',{0},{1})",post.post_title,searchFilterDto.getKeyword());
+
+                   whereBuilder.and(booleanTemplate.gt(0));
                 }
 
-//                if (searchFilterDto.getKeyword() != null && !searchFilterDto.getKeyword().isEmpty()) {
-//                    whereBuilder.and(post.post_title.startsWith(searchFilterDto.getKeyword())
-//                            .or(post.post_text.startsWith(searchFilterDto.getKeyword())));
-//                }
 
 
 
@@ -91,10 +95,9 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
 
 
 
-//                if (searchFilterDto.getKeyword() != null && !searchFilterDto.getKeyword().isEmpty()) {
-//                    whereBuilder.and(post.post_title.containsIgnoreCase(searchFilterDto.getKeyword()));
-//
-//                }
+
+
+
 
                 if (searchFilterDto.getLocations() != null && !searchFilterDto.getLocations().isEmpty()) {
                     BooleanExpression[] categoryExpressions2 = searchFilterDto.getLocations().stream()
@@ -152,6 +155,9 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                     return SearchPosts;
 
                 }
+
+
+
 
 
         }

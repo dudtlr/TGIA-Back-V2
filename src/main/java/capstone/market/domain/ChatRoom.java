@@ -8,7 +8,7 @@ import java.util.List;
 
 @Entity
 @Data
-public class ChatRoom {
+public class ChatRoom{
     @Id @GeneratedValue
     @Column(name = "chatroom_id")
     private Long id;

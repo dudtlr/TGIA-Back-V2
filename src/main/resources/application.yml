@@ -28,9 +28,10 @@ spring:
 
   jpa:
     database: mysql   # 추가 해준 부분
-    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect # 추가 해준 부분
+    database-platform: capstone.market.config.MySQL8DialectCustom # 추가 해준 부분
     hibernate:
       ddl-auto: update
+
 #    properties:
 #      hibernate:
 #        # 얘도 sql 문을 보여주지만 sout 으로 하기 때문에 않좋다.
