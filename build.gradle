@@ -39,6 +39,7 @@ dependencies {
 	// hibernate sql 쿼리문에서 파라미터가 (?, ?) '?' 가 아니라 실제 데이터를 보여주게한다.
 	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.5.6'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis' //redis
+	implementation 'org.springframework.data:spring-data-elasticsearch:4.4.12' // es
 
 }
 

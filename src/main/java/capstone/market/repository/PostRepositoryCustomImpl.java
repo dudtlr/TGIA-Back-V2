@@ -37,7 +37,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
 
 
             @Override
-            @Cacheable("searchResults")
+            //@Cacheable("searchResults")
             public List<PostDetailDto> searchFilterWithPaging(SearchFilterDto searchFilterDto) {
 
                 QPost post = QPost.post;
@@ -73,12 +73,22 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
 
 
 
+
+                //1. %검색어% => 인덱스 불가 => full scan => 성능 한계
 //                if (searchFilterDto.getKeyword() != null && !searchFilterDto.getKeyword().isEmpty()) {
 //                    whereBuilder.and(post.post_title.contains(searchFilterDto.getKeyword())
 //                            .or(post.post_text.contains(searchFilterDto.getKeyword())));
 //                }
 
 
+                //2. 검색어% => 인덱스 사용 가능 but 기능 한계
+                // if (searchFilterDto.getKeyword() != null && !searchFilterDto.getKeyword().isEmpty()) {
+                //                    whereBuilder.and(post.post_title.startsWith(searchFilterDto.getKeyword())
+                //                            .or(post.post_text.startsWith(searchFilterDto.getKeyword())));
+                //                }
+
+
+                //3. mysql - full text search => 인덱스 사용 가능하면서 기능 보완
                 if (searchFilterDto.getKeyword() != null && !searchFilterDto.getKeyword().isEmpty()) {
 
                     NumberTemplate booleanTemplate= Expressions.numberTemplate(Double.class,
@@ -86,15 +96,6 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
 
                    whereBuilder.and(booleanTemplate.gt(0));
                 }
-
-
-
-
-
-
-
-
-
 
 
 

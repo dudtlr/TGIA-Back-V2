@@ -15,12 +15,14 @@ import capstone.market.session.SessionManager;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.action.search.SearchResponse;
 import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,6 +53,14 @@ public class PostController {
 
         List<PostDetailDto> postDetailDtos = postService.searchFilterWithPaging(searchFilterDto);
         return postDetailDtos;
+    }
+
+    @PostMapping("/detailSearchWithPaging3")
+    public List<PostDocumentDTO> SearchWithPaging3(@RequestBody SearchFilterDto searchFilterDto) throws IOException {
+
+        List<PostDocumentDTO> postDocuments = postService.searchFilterWithPaging3(searchFilterDto);
+
+        return postDocuments;
     }
 
     @PostMapping("/reservation_posts")
@@ -209,8 +219,8 @@ public class PostController {
     public void postAdd(@RequestBody AddPostRequest request) {
         Post post = new Post();
 
-        log.info("request_info = {}", request.getUser_id());
-        log.info("request_info.title = {}", request.getTitle());
+        //log.info("request_info = {}", request.getUser_id());
+        //log.info("request_info.title = {}", request.getTitle());
         post.setWho_posted(memberService.findOne(request.getUser_id()));
         post.setPost_title(request.getTitle());
         post.setPost_text(request.getContent());
@@ -222,7 +232,7 @@ public class PostController {
         departmentService.UpdateDepartment(department, request.getDepartment());
         post.setDepartmentType(request.getDepartment());
         post.setItem_name(request.getItem_name());
-        System.out.println("requestadsfadfaf = " + request.getLocationType());
+        //System.out.println("requestadsfadfaf = " + request.getLocationType());
         post.setLocation_text(request.getLocation_text());
         post.setLocationType(request.getLocationType());
         post.setStatus(StatusType.판매중);

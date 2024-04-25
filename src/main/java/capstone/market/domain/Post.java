@@ -17,11 +17,6 @@ import java.util.Set;
 @Entity
 @Data
 
-@Table(indexes = {
-        @Index(name = "idx_post_title", columnList = "post_title"),
-        @Index(name = "idx_post_text", columnList = "post_text")
-})
-
 public class Post extends BaseEntity {
 
     @Id @GeneratedValue
@@ -64,6 +59,7 @@ public class Post extends BaseEntity {
 
     //위치
     private LocationType locationType;
+    //세부사항
     private String location_text;
 
 

@@ -12,23 +12,23 @@ public class SearchFilterDto {
     /**
      카테고리,조회수,좋아요,최신순,키워드
     **/
+
     List<CategoryType> categories;
-
-    Integer views;
-
 
     List<LocationType> locations;
 
+    List<DepartmentType> departments;
+
+    TrackType track;
+
+    CollegeType collegeType;
+
+    Integer views;
     Integer likes;
     String sort;
     String keyword;
 
-    List<DepartmentType> departments;
-    TrackType track;
-    CollegeType collegeType;
-
-
-    Integer page ;
+    Integer page = 0;
     Integer size = 20;
 
     Integer ys=7;
