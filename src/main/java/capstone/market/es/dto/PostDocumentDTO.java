@@ -1,4 +1,4 @@
-package capstone.market.domain;
+package capstone.market.es.dto;
 
 
 import capstone.market.domain.CategoryType;

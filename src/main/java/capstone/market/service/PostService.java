@@ -1,14 +1,16 @@
 package capstone.market.service;
 
 import capstone.market.domain.*;
+import capstone.market.es.dto.PostDocumentDTO;
+import capstone.market.es.repository.PostDocumentElasticsearchRepository;
 import capstone.market.post_dto.PostForm;
 import capstone.market.profile_dto.PostDetailDto;
 import capstone.market.profile_dto.SearchFilterDto;
+import capstone.market.profile_dto.SearchFilterDto2;
 import capstone.market.repository.*;
 
 
 import lombok.RequiredArgsConstructor;
-import org.elasticsearch.action.search.SearchResponse;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -100,16 +102,7 @@ public class PostService {
     }
 
 
-    // 엘라스틱 서치
-    public List<PostDocumentDTO> searchFilterWithPaging3 (SearchFilterDto searchFilterDto) throws IOException {
 
-
-
-
-        return postDocumentElasticsearchRepository.searchFilterWithPaging3(searchFilterDto);
-
-
-    }
 
 
 

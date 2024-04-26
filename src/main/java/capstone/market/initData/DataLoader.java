@@ -1,553 +1,555 @@
-//package capstone.market.initData;
-//
-//import capstone.market.bugigram.User;
-//import capstone.market.bugigram.UserJpaRepository;
-//import capstone.market.bugigram.UserPost;
-//import capstone.market.bugigram.UserPostJpaRepository;
-//import capstone.market.domain.*;
-//import capstone.market.repository.*;
-//import capstone.market.service.ChatService;
-//import capstone.market.service.ImageService;
-//import capstone.market.service.PostService;
-//import lombok.Data;
-//import lombok.extern.slf4j.Slf4j;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.stereotype.Component;
-//
-//import javax.annotation.PostConstruct;
-//import java.time.LocalDateTime;
-//import java.time.format.DateTimeFormatter;
-//import java.util.*;
-//import java.util.concurrent.ThreadLocalRandom;
-//
-//@Component
-//@Slf4j
-//public class DataLoader {
+package capstone.market.initData;
+
+import capstone.market.bugigram.User;
+import capstone.market.bugigram.UserJpaRepository;
+import capstone.market.bugigram.UserPost;
+import capstone.market.bugigram.UserPostJpaRepository;
+import capstone.market.domain.*;
+import capstone.market.es.domain.PostDocument;
+import capstone.market.es.repository.PostDocumentRepository;
+import capstone.market.repository.*;
+import capstone.market.service.ChatService;
+import capstone.market.service.ImageService;
+import capstone.market.service.PostService;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+
+@Component
+@Slf4j
+public class DataLoader {
+    @Autowired
+    private PostService postService;
+    @Autowired
+    private MannerRepository mannerRepository;
+
+    @Autowired
+    private UserPostJpaRepository userPostJpaRepository;
+    @Autowired
+    private ImageRepository imageRepository;
+    @Autowired
+    private UserJpaRepository userJpaRepository;
+    @Autowired
+    private MemberRepository memberRepository;
+    @Autowired
+    private PostRepository postRepository;
+    @Autowired
+    private PurchasedRepository purchasedRepository;
+    @Autowired
+    private DepartMentJpaRepository departMentJpaRepository;
+    //    @Autowired
+//    private ChatRoomRepository chatRoomRepository;
 //    @Autowired
-//    private PostService postService;
-//    @Autowired
-//    private MannerRepository mannerRepository;
-//
-//    @Autowired
-//    private UserPostJpaRepository userPostJpaRepository;
-//    @Autowired
-//    private ImageRepository imageRepository;
-//    @Autowired
-//    private UserJpaRepository userJpaRepository;
-//    @Autowired
-//    private MemberRepository memberRepository;
-//    @Autowired
-//    private PostRepository postRepository;
-//    @Autowired
-//    private PurchasedRepository purchasedRepository;
-//    @Autowired
-//    private DepartMentJpaRepository departMentJpaRepository;
-//    //    @Autowired
-////    private ChatRoomRepository chatRoomRepository;
-////    @Autowired
-////    private ChatMessageRepository chatMessageRepository;
-//    @Autowired
-//    private PostDataJpaRepository postDataJpaRepository;
-//    @Autowired
-//    private ImageService imageService;
-//    @Autowired
-//    private FirstTrackJpaRepository firstTrackJpaRepository;
-//    @Autowired
-//    private SecondTrackJpaRepository secondTrackJpaRepository;
-//    @Autowired
-//    ChatService chatService;
-//    @Autowired
-//    private CategoryJpaRepository categoryJpaRepository;
-//    @Autowired
-//    private FavoriteJpaRepository favoriteJpaRepository;
-//    @Autowired
-//    private PostDocumentRepository postDocumentRepository;
-//    List<Post> posts = new ArrayList<>();
-//
-//    private static final String[] lastNames = {
-//            "김", "이", "박", "최", "정", "강", "조", "윤", "장", "임", "오", "한", "신", "서", "권",
-//            "황", "안", "송", "류", "홍", "전", "고", "문", "양", "손", "배", "조", "백", "허", "유"
-//    };
-//
-//    private static final String[] firstNames = {
-//            "민준", "서준", "예준", "도윤", "시우", "주원", "하준", "지호", "지후", "준서", "준우", "현우",
-//            "예준", "건우", "민재", "유준", "민성", "유찬", "현준", "민규", "우진", "재훈", "태민", "은우",
-//            "영민", "성민", "주현", "민호", "동현", "태현", "승우", "성준", "예성", "동준", "동혁", "민우",
-//            "예성", "재원", "은호", "준혁", "서진", "민찬", "윤우", "현서", "현성", "준영", "승민", "동우"
-//    };
-//
-//    private static final String[] salePhrases = {
-//            "팔아요", "팔께요", "팔아 버립니다", "사주세요", "진짜 싸게 파는 건데", "팝니다!", "팔아요!",
-//            "싸게 드려요", "합리적인 가격에 팝니다", "빠른 판매 부탁드려요", "저렴한 가격으로 팔아요", "꼭 사세요!",
-//            "최신 상품이에요", "많이 사용하지 않았어요", "마음에 드셔요", "인기 상품입니다", "마감 임박 상품입니다",
-//            "한정 수량입니다", "놓치지 마세요!", "가성비 최고에요", "무료 배송합니다", "양도합니다",
-//            "상태 최상입니다", "미개봉 제품입니다", "고급 소재로 만들었어요", "종류 다양해요", "무료 증정품 있어요",
-//            "빠른 거래 가능합니다", "추가 할인해드려요", "언제든지 문의주세요", "많은 관심 부탁드려요", "한 번 사용한 적 없어요",
-//            "사용감 거의 없어요", "착용감이 좋아요", "대박 세일 중입니다", "포장 상태 좋아요", "조금만 더 기다려주세요",
-//            "유명 브랜드 제품입니다", "빠르게 팔고 싶어요", "즉시 구매 가능합니다", "놓치지 않으셨나요?", "필요 없어져서 팝니다",
-//            "바로 가져가세요", "추가 사진 보내드려요", "확실한 구매를 약속드려요", "퀄리티 좋아요", "가격 흥정 가능합니다",
-//            "신상품입니다", "첫 손님에게 특별 혜택", "할인 이벤트 진행 중", "관심이 많아요", "언제든지 가격 조정 가능해요",
-//            "성능 좋아요", "한 번 사용해보세요", "사용법 간단합니다", "마감 임박 상품이에요", "매우 저렴한 가격에 팝니다"
-//    };
-//
-//
-//    public static String generateRandomKoreanName() {
-//        Random random = new Random();
-//        String lastName = lastNames[random.nextInt(lastNames.length)];
-//        String firstName = firstNames[random.nextInt(firstNames.length)];
-//        return lastName + firstName;
-//    }
-//
-//    /*
-//    @PostConstruct
-//    public void init() {
-//        Member memberA = new Member("memberA");
-//        Member memberB = new Member("memberB");
-//
-//        memberRepository.save(memberA);
-//        memberRepository.save(memberB);
-//
-//        Post post = new Post(memberA);
-//        post.setPost_title("hello");
-//        post.setPrice(10000);
-//        postRepository.savePost(post);
-//    }
-//    */
-//    public LocalDateTime generateRandomCreatedDate() {
-//        // Generate random month within the range of 1 (January) to 12 (December)
-//        int randomMonth = ThreadLocalRandom.current().nextInt(1, 5);
-//
-//        // Generate random day within the range of 1 to 28 (assumes a non-leap year)
-//        int randomDay = ThreadLocalRandom.current().nextInt(1, 29);
-//        return LocalDateTime.of(2023, randomMonth, randomDay, 0, 0);
-//    }
-//
-//    @PostConstruct
-//    public void init() {
-//
-//        Member minkyu = new Member("minkyu");
-//        minkyu.setUsername("민규");
-//
-//        Member gunhee = new Member("gunhee");
-//        gunhee.setUsername("건희");
-//
-//        Member jys = new Member("jys");
-//        jys.setUsername("영식");
-//
-//        Member brave = new Member("brave");
-//        brave.setUsername("용기");
-//
-//
-//
-//
-//
-//        LocalDateTime now = LocalDateTime.now();
-//
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
-//        String formattedDate = now.format(formatter);
-//        minkyu.setCreatedDate(formattedDate);
-//        brave.setCreatedDate(formattedDate);
-//        gunhee.setCreatedDate(formattedDate);
-//        jys.setCreatedDate(formattedDate);
-//
-//        Image image = new Image();
-//        image.setImageFilename("basicprofile.png");
-//        imageRepository.save(image);
-//        CategoryType[] categories = CategoryType.values();
-//        DepartmentType[] departmentTypes = DepartmentType.values();
-//        Random random = new Random();
-//
-//        Department department = new Department(DepartmentType.컴퓨터공학부);
-//        Department iotCombined = new Department(DepartmentType.IT융합공학부);
-//        departMentJpaRepository.save(department);
-//        departMentJpaRepository.save(iotCombined);
-//
-//        FirstTrack firstTrack = new FirstTrack(TrackType.웹공학트랙, department);
-//        firstTrackJpaRepository.save(firstTrack);
-//
-//        FirstTrack firstTrack1 = new FirstTrack(TrackType.웹공학트랙, department);
-//        firstTrackJpaRepository.save(firstTrack1);
-//
-//        SecondTrack secondTrack = new SecondTrack(TrackType.빅데이터트랙, department);
-//        secondTrackJpaRepository.save(secondTrack);
-//
-//        SecondTrack secondTrack1 = new SecondTrack(TrackType.빅데이터트랙, department);
-//        secondTrackJpaRepository.save(secondTrack1);
-//
-//        minkyu.setFirstTrack(firstTrack);
-//        minkyu.setSecondTrack(secondTrack);
-//        // minkyu.setImage(image1);
-//
-//        gunhee.setFirstTrack(firstTrack1);
-//        gunhee.setSecondTrack(secondTrack1);
-//
-//        jys.setFirstTrack(firstTrack1);
-//        jys.setSecondTrack(secondTrack1);
-//
-//        brave.setFirstTrack(firstTrack1);
-//        brave.setSecondTrack(secondTrack1);
-//
-//        jys.setFirst_college(CollegeType.상상력교양대학);
-//        brave.setFirst_college(CollegeType.디자인대학);
-//
-//        Image image1 = new Image();
-//        image1.setImageFilename("aaa.png");
-//        imageRepository.save(image1);
-//
-//        Image gunheeProfile = new Image();
-//        gunheeProfile.setImageFilename("gunheeProfile.png");
-//        imageRepository.save(gunheeProfile);
-//
-//        Image braveProfile = new Image();
-//        braveProfile.setImageFilename("braveProfile.png");
-//        imageRepository.save(braveProfile);
-//
-//        Image jysProfile = new Image();
-//        jysProfile.setImageFilename("jysProfile.png");
-//        imageRepository.save(jysProfile);
-//
-//        User user1 = new User();
-//        user1.setName("전영식");
-//        user1.setNickname("식이");
-//        user1.setEmail("sik2@naver.com");
-//        user1.setPassword("@Qwerqwer");
-//        user1.setImageFilename(jysProfile.getImageFilename());
-//        userJpaRepository.save(user1);
-//
-//        UserPost userPost1 = new UserPost();
-//        userPost1.setUser(user1);
-//        userPost1.setPostImageFilename("70_j.jpg");
-//        userPost1.setIntroTextField("향수 샀다~~ 예쁘죠??");
-//        userPost1.setLikeTextField("좋아요 89개");
-//
-//        userPostJpaRepository.save(userPost1);
-//
-//        UserPost userPost2 = new UserPost();
-//        userPost2.setUser(user1);
-//        userPost2.setPostImageFilename("67_j.jpeg");
-//        userPost2.setIntroTextField("오늘도 부기 토트백 !!~~");
-//        userPost2.setLikeTextField("좋아요 122개");
-//
-//        userPostJpaRepository.save(userPost2);
-//
-//        UserPost userPost3 = new UserPost();
-//        userPost3.setUser(user1);
-//        userPost3.setPostImageFilename("55_j.jpg");
-//        userPost3.setIntroTextField("아이패드 샀다~~ 부럽지 애들아??");
-//        userPost3.setLikeTextField("좋아요 139개");
-//
-//        userPostJpaRepository.save(userPost3);
-//
-//        UserPost userPost4 = new UserPost();
-//        userPost4.setUser(user1);
-//        userPost4.setPostImageFilename("9_j.jpeg");
-//        userPost4.setIntroTextField("오늘 전독시 책만 읽었다...ㅋㅋㅋㅋㅋ");
-//        userPost4.setLikeTextField("좋아요 512개");
-//
-//        userPostJpaRepository.save(userPost4);
-//
-//        UserPost userPost5 = new UserPost();
-//        userPost5.setUser(user1);
-//        userPost5.setPostImageFilename("1_j.jpg");
-//        userPost5.setIntroTextField("오늘도 스프링 공부!!");
-//        userPost5.setLikeTextField("좋아요 39개");
-//
-//        userPostJpaRepository.save(userPost5);
-//
-//
-//        User user2 = new User();
-//        user2.setName("차은우");
-//        user2.setNickname("은우");
-//        user2.setEmail("1@naver.com");
-//        user2.setPassword("@Qwerqwer");
-//        user2.setImageFilename("jj1.webp");
-//        userJpaRepository.save(user2);
-//
-//        UserPost userPost6 = new UserPost();
-//        userPost6.setUser(user2);
-//        userPost6.setPostImageFilename("boggie1.png");
-//        userPost6.setIntroTextField("부기 너무 귀여워!");
-//        userPost6.setLikeTextField("좋아요 198개");
-//
-//        userPostJpaRepository.save(userPost6);
-//
-//
-//
-//
-//        User user3 = new User();
-//        user3.setName("이재훈");
-//        user3.setNickname("재훈");
-//        user3.setEmail("2@naver.com");
-//        user3.setPassword("@Qwerqwer");
-//        user3.setImageFilename("jj2.jpg");
-//        userJpaRepository.save(user3);
-//
-//        UserPost userPost7 = new UserPost();
-//        userPost7.setUser(user3);
-//        userPost7.setPostImageFilename("bugi.png");
-//        userPost7.setIntroTextField("부기 인형 너무 귀여워!!!!!!");
-//        userPost7.setLikeTextField("좋아요 1249개");
-//
-//        userPostJpaRepository.save(userPost7);
-//
-//
-//
-//        User user4 = new User();
-//        user4.setName("정해인");
-//        user4.setNickname("해인");
-//        user4.setEmail("3@naver.com");
-//        user4.setPassword("@Qwerqwer");
-//        user4.setImageFilename("jj3.webp");
-//        userJpaRepository.save(user4);
-//
-//        UserPost userPost8 = new UserPost();
-//        userPost8.setUser(user4);
-//        userPost8.setPostImageFilename("elec3_1.jpeg");
-//        userPost8.setIntroTextField("아이패드 샀다 애들아!!!!");
-//        userPost8.setLikeTextField("좋아요 12개");
-//
-//        userPostJpaRepository.save(userPost8);
-//
-//
-//        User user5 = new User();
-//        user5.setName("이혜주");
-//        user5.setNickname("혜주");
-//        user5.setEmail("4@naver.com");
-//        user5.setPassword("@Qwerqwer");
-//        user5.setImageFilename("jj4.png");
-//        userJpaRepository.save(user5);
-//
-//        UserPost userPost9 = new UserPost();
-//        userPost9.setUser(user5);
-//        userPost9.setPostImageFilename("brave_beauty_1_1.jpg");
-//        userPost9.setIntroTextField("향수 이쁘지~~~~");
-//        userPost9.setLikeTextField("좋아요 11232개");
-//
-//        userPostJpaRepository.save(userPost9);
-//
-//
-//
-//        User user6 = new User();
-//        user6.setName("이주빈");
-//        user6.setNickname("주빈");
-//        user6.setEmail("5@naver.com");
-//        user6.setPassword("@Qwerqwer");
-//        user6.setImageFilename("jj5.jpg");
-//        userJpaRepository.save(user6);
-//
-//        UserPost userPost10 = new UserPost();
-//        userPost10.setUser(user6);
-//        userPost10.setPostImageFilename("brave_beauty_1_2.jpg");
-//        userPost10.setIntroTextField("새 향수 개봉~~~~");
-//        userPost10.setLikeTextField("좋아요 23232개");
-//
-//        userPostJpaRepository.save(userPost10);
-//
-//
-//
-//        User user7 = new User();
-//        user7.setName("마리오");
-//        user7.setNickname("마리오");
-//        user7.setEmail("6@naver.com");
-//        user7.setPassword("@Qwerqwer");
-//        user7.setImageFilename("jj6.jpg");
-//        userJpaRepository.save(user7);
-//
-//        UserPost userPost11 = new UserPost();
-//        userPost11.setUser(user7);
-//        userPost11.setPostImageFilename("brave_beauty_3_1.jpg");
-//        userPost11.setIntroTextField("오늘 플렉스 했다~~ 내 시계 어때!!");
-//        userPost11.setLikeTextField("좋아요 12개");
-//
-//        userPostJpaRepository.save(userPost11);
-//
-//
-//        User user8 = new User();
-//        user8.setName("곰돌이");
-//        user8.setNickname("곰돌이");
-//        user8.setEmail("7@naver.com");
-//        user8.setPassword("@Qwerqwer");
-//        user8.setImageFilename("jj7.jpeg");
-//        userJpaRepository.save(user8);
-//
-//        UserPost userPost12 = new UserPost();
-//        userPost12.setUser(user8);
-//        userPost12.setPostImageFilename("brave_book_3_1.jpg");
-//        userPost12.setIntroTextField("오늘부터 공부....");
-//        userPost12.setLikeTextField("좋아요 12개");
-//
-//        userPostJpaRepository.save(userPost12);
-//
-//
-//        User user9 = new User();
-//        user9.setName("김현수");
-//        user9.setNickname("현수");
-//        user9.setEmail("8@naver.com");
-//        user9.setPassword("@Qwerqwer");
-//        user9.setImageFilename("jj8.jpeg");
-//        userJpaRepository.save(user9);
-//
-//        User user10 = new User();
-//        user10.setName("돌고래");
-//        user10.setNickname("고래");
-//        user10.setEmail("9@naver.com");
-//        user10.setPassword("@Qwerqwer");
-//        user10.setImageFilename("jj9.png");
-//        userJpaRepository.save(user10);
-//
-//        User user11 = new User();
-//        user11.setName("임하람");
-//        user11.setNickname("하람");
-//        user11.setEmail("10@naver.com");
-//        user11.setPassword("@Qwerqwer");
-//        user11.setImageFilename("jj10.jpg");
-//        userJpaRepository.save(user11);
-//
-//
-//
-//
-//
-//
-//
-//
-//        jys.setImage(jysProfile);
-//
-//        gunhee.setImage(gunheeProfile);
-//        minkyu.setImage(image1);
-//        brave.setImage(braveProfile);
-//
-//
-//
-//        Manner mannerA = new Manner();
-//        mannerRepository.save(mannerA);
-//        minkyu.setManner(mannerA);
-//
-//        Manner mannerB = new Manner();
-//        mannerRepository.save(mannerB);
-//        gunhee.setManner(mannerB);
-//
-//        Manner mannerC = new Manner();
-//        mannerRepository.save(mannerC);
-//        jys.setManner(mannerC);
-//
-//        Manner mannerD = new Manner();
-//        mannerRepository.save(mannerD);
-//        brave.setManner(mannerD);
-//
-//        memberRepository.save(minkyu);
-//        memberRepository.save(gunhee);
-//        memberRepository.save(jys);
-//        memberRepository.save(brave);
-//        // user_id 가 memberA인 멤버의 트랙1: 웹공학트랙, 2트랙을 빅데이터트랙
-//        // 프론트에서 pk id가 4인 멤버의 트랙1, 2를 물어본다면?
-//
-//        Member dummyMemberForSale = new Member("dummyForSale");
-//        dummyMemberForSale.setUsername(generateRandomKoreanName());
-//        Manner dummyMannerForSale = new Manner();
-//        mannerRepository.save(dummyMannerForSale);
-//        dummyMemberForSale.setManner(dummyMannerForSale);
-//        dummyMemberForSale.setImage(image1);
-//        dummyMemberForSale.setFirst_college(CollegeType.IT공과대학);
-//        FirstTrack dummyFirstTrackForSale = new FirstTrack(TrackType.사물인터넷트랙, iotCombined);
-//        SecondTrack dummySecondTrackForSale = new SecondTrack(TrackType.지능시스템트랙, iotCombined);
-//        firstTrackJpaRepository.save(dummyFirstTrackForSale);
-//        secondTrackJpaRepository.save(dummySecondTrackForSale);
-//        dummyMemberForSale.setFirstTrack(dummyFirstTrackForSale);
-//        dummyMemberForSale.setSecondTrack(dummySecondTrackForSale);
-//        dummyMemberForSale.setCreatedDate(formattedDate);
-//        memberRepository.save(dummyMemberForSale);
-//
-//        for (int i = 0;i<1;i++) {
-//            Member dummyMember = new Member("dummy" + i);
-//            dummyMember.setUsername(generateRandomKoreanName());
-//            LocalDateTime randomCreatedDate = generateRandomCreatedDate();
-//
-//            DateTimeFormatter randomMemberDateFormatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
-//            String formatted = randomCreatedDate.format(randomMemberDateFormatter);
-//            Manner dummyManner = new Manner();
-//            mannerRepository.save(dummyManner);
-//            dummyMember.setManner(dummyManner);
-//            dummyMember.setImage(image1);
-//            dummyMember.setFirst_college(CollegeType.IT공과대학);
-//            FirstTrack dummyFirstTrack = new FirstTrack(TrackType.사물인터넷트랙, iotCombined);
-//            SecondTrack dummySecondTrack = new SecondTrack(TrackType.지능시스템트랙, iotCombined);
-//            firstTrackJpaRepository.save(dummyFirstTrack);
-//            secondTrackJpaRepository.save(dummySecondTrack);
-//            dummyMember.setFirstTrack(dummyFirstTrack);
-//            dummyMember.setSecondTrack(dummySecondTrack);
-//            dummyMember.setCreatedDate(formatted);
-//            memberRepository.save(dummyMember);
-//        }
-//
-//        Category post1category = new Category();
-//        Category post2category = new Category();
-//        Category post3category = new Category();
-//        Category post4category = new Category();
-//        Category post5category = new Category();
-//
-//        post1category.setCategory_type(CategoryType.도서);
-//        post2category.setCategory_type(CategoryType.생활가전);
-//        post3category.setCategory_type(CategoryType.전자기기);
-//        post4category.setCategory_type(CategoryType.전자기기);
-//        post5category.setCategory_type(CategoryType.뷰티미용);
-//
-//        categoryJpaRepository.save(post1category);
-//        categoryJpaRepository.save(post2category);
-//        categoryJpaRepository.save(post3category);
-//        categoryJpaRepository.save(post4category);
-//        categoryJpaRepository.save(post5category);
-//
-//        LocationType[] locations = LocationType.values();
-//
-////            our_memory_image1.setPost(post2);
-//
-//
-//
-//        Post post1 = new Post();
-//        post1.setPost_title("제목1");
-//        post1.setPost_text("내용");
-////        Post post1 = new Post("제목1","내용");
-//
-//
-//        Post javaBookPost = new Post();
-//        javaBookPost.setPost_title("객지2 교재 팝니다!");
-//        javaBookPost.setPost_text("메모 거의 없습니다!");
-//
-//        Post macBookPost = new Post("오머~ 맥북 프로 싸게 팔아요~","진짜 찐으로 싸게 파는 거라서 가격협상은 힙들어요..");
-//        Post bugiPost = new Post("부기 굿즈 팔아요!","부기 팔아요 싸게 파는거에용");
-//
-//        post1.setWho_posted(minkyu);
-//        javaBookPost.setWho_posted(minkyu);
-//        macBookPost.setWho_posted(gunhee);
-//        bugiPost.setWho_posted(brave);
-//
-////        macBookPost.generateRandomCreatedDate();
-//
-//        post1.setPrice(10000);
-//        javaBookPost.setPrice(8000);
-//        macBookPost.setPrice(900000);
-//        bugiPost.setPrice(2000);
-//
-//        // Set the created date for macBookPost with the random month, day, and current year (2023)
-//
-//
-//
-//
-//        // 방금방금
-//        //구매목록 하나 만들기금
-//        // 멤버 a가올린 포스트를 멤버 b가 사면서 포스트에 구매 목록에 멤버가 멤버b로 바뀜
-//      /*  Purchased purchased = new Purchased();
-//        purchased.setMember(gunhee);
-//        purchasedRepository.save(purchased);
-//        post1.setPurchased(purchased);
-//        postRepository.savePost(post1);
-//
-//        Purchased purchased2 = new Purchased();
-//        purchased2.setMember(brave);
-//        purchasedRepository.save(purchased2);
-//       macBookPost.setPurchased(purchased2);*/
-//
-//
+//    private ChatMessageRepository chatMessageRepository;
+    @Autowired
+    private PostDataJpaRepository postDataJpaRepository;
+    @Autowired
+    private ImageService imageService;
+    @Autowired
+    private FirstTrackJpaRepository firstTrackJpaRepository;
+    @Autowired
+    private SecondTrackJpaRepository secondTrackJpaRepository;
+    @Autowired
+    ChatService chatService;
+    @Autowired
+    private CategoryJpaRepository categoryJpaRepository;
+    @Autowired
+    private FavoriteJpaRepository favoriteJpaRepository;
+    @Autowired
+    private PostDocumentRepository postDocumentRepository;
+    List<Post> posts = new ArrayList<>();
+
+    private static final String[] lastNames = {
+            "김", "이", "박", "최", "정", "강", "조", "윤", "장", "임", "오", "한", "신", "서", "권",
+            "황", "안", "송", "류", "홍", "전", "고", "문", "양", "손", "배", "조", "백", "허", "유"
+    };
+
+    private static final String[] firstNames = {
+            "민준", "서준", "예준", "도윤", "시우", "주원", "하준", "지호", "지후", "준서", "준우", "현우",
+            "예준", "건우", "민재", "유준", "민성", "유찬", "현준", "민규", "우진", "재훈", "태민", "은우",
+            "영민", "성민", "주현", "민호", "동현", "태현", "승우", "성준", "예성", "동준", "동혁", "민우",
+            "예성", "재원", "은호", "준혁", "서진", "민찬", "윤우", "현서", "현성", "준영", "승민", "동우"
+    };
+
+    private static final String[] salePhrases = {
+            "팔아요", "팔께요", "팔아 버립니다", "사주세요", "진짜 싸게 파는 건데", "팝니다!", "팔아요!",
+            "싸게 드려요", "합리적인 가격에 팝니다", "빠른 판매 부탁드려요", "저렴한 가격으로 팔아요", "꼭 사세요!",
+            "최신 상품이에요", "많이 사용하지 않았어요", "마음에 드셔요", "인기 상품입니다", "마감 임박 상품입니다",
+            "한정 수량입니다", "놓치지 마세요!", "가성비 최고에요", "무료 배송합니다", "양도합니다",
+            "상태 최상입니다", "미개봉 제품입니다", "고급 소재로 만들었어요", "종류 다양해요", "무료 증정품 있어요",
+            "빠른 거래 가능합니다", "추가 할인해드려요", "언제든지 문의주세요", "많은 관심 부탁드려요", "한 번 사용한 적 없어요",
+            "사용감 거의 없어요", "착용감이 좋아요", "대박 세일 중입니다", "포장 상태 좋아요", "조금만 더 기다려주세요",
+            "유명 브랜드 제품입니다", "빠르게 팔고 싶어요", "즉시 구매 가능합니다", "놓치지 않으셨나요?", "필요 없어져서 팝니다",
+            "바로 가져가세요", "추가 사진 보내드려요", "확실한 구매를 약속드려요", "퀄리티 좋아요", "가격 흥정 가능합니다",
+            "신상품입니다", "첫 손님에게 특별 혜택", "할인 이벤트 진행 중", "관심이 많아요", "언제든지 가격 조정 가능해요",
+            "성능 좋아요", "한 번 사용해보세요", "사용법 간단합니다", "마감 임박 상품이에요", "매우 저렴한 가격에 팝니다"
+    };
+
+
+    public static String generateRandomKoreanName() {
+        Random random = new Random();
+        String lastName = lastNames[random.nextInt(lastNames.length)];
+        String firstName = firstNames[random.nextInt(firstNames.length)];
+        return lastName + firstName;
+    }
+
+    /*
+    @PostConstruct
+    public void init() {
+        Member memberA = new Member("memberA");
+        Member memberB = new Member("memberB");
+
+        memberRepository.save(memberA);
+        memberRepository.save(memberB);
+
+        Post post = new Post(memberA);
+        post.setPost_title("hello");
+        post.setPrice(10000);
+        postRepository.savePost(post);
+    }
+    */
+    public LocalDateTime generateRandomCreatedDate() {
+        // Generate random month within the range of 1 (January) to 12 (December)
+        int randomMonth = ThreadLocalRandom.current().nextInt(1, 5);
+
+        // Generate random day within the range of 1 to 28 (assumes a non-leap year)
+        int randomDay = ThreadLocalRandom.current().nextInt(1, 29);
+        return LocalDateTime.of(2023, randomMonth, randomDay, 0, 0);
+    }
+
+    @PostConstruct
+    public void init() {
+
+        Member minkyu = new Member("minkyu");
+        minkyu.setUsername("민규");
+
+        Member gunhee = new Member("gunhee");
+        gunhee.setUsername("건희");
+
+        Member jys = new Member("jys");
+        jys.setUsername("영식");
+
+        Member brave = new Member("brave");
+        brave.setUsername("용기");
+
+
+
+
+
+        LocalDateTime now = LocalDateTime.now();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
+        String formattedDate = now.format(formatter);
+        minkyu.setCreatedDate(formattedDate);
+        brave.setCreatedDate(formattedDate);
+        gunhee.setCreatedDate(formattedDate);
+        jys.setCreatedDate(formattedDate);
+
+        Image image = new Image();
+        image.setImageFilename("basicprofile.png");
+        imageRepository.save(image);
+        CategoryType[] categories = CategoryType.values();
+        DepartmentType[] departmentTypes = DepartmentType.values();
+        Random random = new Random();
+
+        Department department = new Department(DepartmentType.컴퓨터공학부);
+        Department iotCombined = new Department(DepartmentType.IT융합공학부);
+        departMentJpaRepository.save(department);
+        departMentJpaRepository.save(iotCombined);
+
+        FirstTrack firstTrack = new FirstTrack(TrackType.웹공학트랙, department);
+        firstTrackJpaRepository.save(firstTrack);
+
+        FirstTrack firstTrack1 = new FirstTrack(TrackType.웹공학트랙, department);
+        firstTrackJpaRepository.save(firstTrack1);
+
+        SecondTrack secondTrack = new SecondTrack(TrackType.빅데이터트랙, department);
+        secondTrackJpaRepository.save(secondTrack);
+
+        SecondTrack secondTrack1 = new SecondTrack(TrackType.빅데이터트랙, department);
+        secondTrackJpaRepository.save(secondTrack1);
+
+        minkyu.setFirstTrack(firstTrack);
+        minkyu.setSecondTrack(secondTrack);
+        // minkyu.setImage(image1);
+
+        gunhee.setFirstTrack(firstTrack1);
+        gunhee.setSecondTrack(secondTrack1);
+
+        jys.setFirstTrack(firstTrack1);
+        jys.setSecondTrack(secondTrack1);
+
+        brave.setFirstTrack(firstTrack1);
+        brave.setSecondTrack(secondTrack1);
+
+        jys.setFirst_college(CollegeType.상상력교양대학);
+        brave.setFirst_college(CollegeType.디자인대학);
+
+        Image image1 = new Image();
+        image1.setImageFilename("aaa.png");
+        imageRepository.save(image1);
+
+        Image gunheeProfile = new Image();
+        gunheeProfile.setImageFilename("gunheeProfile.png");
+        imageRepository.save(gunheeProfile);
+
+        Image braveProfile = new Image();
+        braveProfile.setImageFilename("braveProfile.png");
+        imageRepository.save(braveProfile);
+
+        Image jysProfile = new Image();
+        jysProfile.setImageFilename("jysProfile.png");
+        imageRepository.save(jysProfile);
+
+        User user1 = new User();
+        user1.setName("전영식");
+        user1.setNickname("식이");
+        user1.setEmail("sik2@naver.com");
+        user1.setPassword("@Qwerqwer");
+        user1.setImageFilename(jysProfile.getImageFilename());
+        userJpaRepository.save(user1);
+
+        UserPost userPost1 = new UserPost();
+        userPost1.setUser(user1);
+        userPost1.setPostImageFilename("70_j.jpg");
+        userPost1.setIntroTextField("향수 샀다~~ 예쁘죠??");
+        userPost1.setLikeTextField("좋아요 89개");
+
+        userPostJpaRepository.save(userPost1);
+
+        UserPost userPost2 = new UserPost();
+        userPost2.setUser(user1);
+        userPost2.setPostImageFilename("67_j.jpeg");
+        userPost2.setIntroTextField("오늘도 부기 토트백 !!~~");
+        userPost2.setLikeTextField("좋아요 122개");
+
+        userPostJpaRepository.save(userPost2);
+
+        UserPost userPost3 = new UserPost();
+        userPost3.setUser(user1);
+        userPost3.setPostImageFilename("55_j.jpg");
+        userPost3.setIntroTextField("아이패드 샀다~~ 부럽지 애들아??");
+        userPost3.setLikeTextField("좋아요 139개");
+
+        userPostJpaRepository.save(userPost3);
+
+        UserPost userPost4 = new UserPost();
+        userPost4.setUser(user1);
+        userPost4.setPostImageFilename("9_j.jpeg");
+        userPost4.setIntroTextField("오늘 전독시 책만 읽었다...ㅋㅋㅋㅋㅋ");
+        userPost4.setLikeTextField("좋아요 512개");
+
+        userPostJpaRepository.save(userPost4);
+
+        UserPost userPost5 = new UserPost();
+        userPost5.setUser(user1);
+        userPost5.setPostImageFilename("1_j.jpg");
+        userPost5.setIntroTextField("오늘도 스프링 공부!!");
+        userPost5.setLikeTextField("좋아요 39개");
+
+        userPostJpaRepository.save(userPost5);
+
+
+        User user2 = new User();
+        user2.setName("차은우");
+        user2.setNickname("은우");
+        user2.setEmail("1@naver.com");
+        user2.setPassword("@Qwerqwer");
+        user2.setImageFilename("jj1.webp");
+        userJpaRepository.save(user2);
+
+        UserPost userPost6 = new UserPost();
+        userPost6.setUser(user2);
+        userPost6.setPostImageFilename("boggie1.png");
+        userPost6.setIntroTextField("부기 너무 귀여워!");
+        userPost6.setLikeTextField("좋아요 198개");
+
+        userPostJpaRepository.save(userPost6);
+
+
+
+
+        User user3 = new User();
+        user3.setName("이재훈");
+        user3.setNickname("재훈");
+        user3.setEmail("2@naver.com");
+        user3.setPassword("@Qwerqwer");
+        user3.setImageFilename("jj2.jpg");
+        userJpaRepository.save(user3);
+
+        UserPost userPost7 = new UserPost();
+        userPost7.setUser(user3);
+        userPost7.setPostImageFilename("bugi.png");
+        userPost7.setIntroTextField("부기 인형 너무 귀여워!!!!!!");
+        userPost7.setLikeTextField("좋아요 1249개");
+
+        userPostJpaRepository.save(userPost7);
+
+
+
+        User user4 = new User();
+        user4.setName("정해인");
+        user4.setNickname("해인");
+        user4.setEmail("3@naver.com");
+        user4.setPassword("@Qwerqwer");
+        user4.setImageFilename("jj3.webp");
+        userJpaRepository.save(user4);
+
+        UserPost userPost8 = new UserPost();
+        userPost8.setUser(user4);
+        userPost8.setPostImageFilename("elec3_1.jpeg");
+        userPost8.setIntroTextField("아이패드 샀다 애들아!!!!");
+        userPost8.setLikeTextField("좋아요 12개");
+
+        userPostJpaRepository.save(userPost8);
+
+
+        User user5 = new User();
+        user5.setName("이혜주");
+        user5.setNickname("혜주");
+        user5.setEmail("4@naver.com");
+        user5.setPassword("@Qwerqwer");
+        user5.setImageFilename("jj4.png");
+        userJpaRepository.save(user5);
+
+        UserPost userPost9 = new UserPost();
+        userPost9.setUser(user5);
+        userPost9.setPostImageFilename("brave_beauty_1_1.jpg");
+        userPost9.setIntroTextField("향수 이쁘지~~~~");
+        userPost9.setLikeTextField("좋아요 11232개");
+
+        userPostJpaRepository.save(userPost9);
+
+
+
+        User user6 = new User();
+        user6.setName("이주빈");
+        user6.setNickname("주빈");
+        user6.setEmail("5@naver.com");
+        user6.setPassword("@Qwerqwer");
+        user6.setImageFilename("jj5.jpg");
+        userJpaRepository.save(user6);
+
+        UserPost userPost10 = new UserPost();
+        userPost10.setUser(user6);
+        userPost10.setPostImageFilename("brave_beauty_1_2.jpg");
+        userPost10.setIntroTextField("새 향수 개봉~~~~");
+        userPost10.setLikeTextField("좋아요 23232개");
+
+        userPostJpaRepository.save(userPost10);
+
+
+
+        User user7 = new User();
+        user7.setName("마리오");
+        user7.setNickname("마리오");
+        user7.setEmail("6@naver.com");
+        user7.setPassword("@Qwerqwer");
+        user7.setImageFilename("jj6.jpg");
+        userJpaRepository.save(user7);
+
+        UserPost userPost11 = new UserPost();
+        userPost11.setUser(user7);
+        userPost11.setPostImageFilename("brave_beauty_3_1.jpg");
+        userPost11.setIntroTextField("오늘 플렉스 했다~~ 내 시계 어때!!");
+        userPost11.setLikeTextField("좋아요 12개");
+
+        userPostJpaRepository.save(userPost11);
+
+
+        User user8 = new User();
+        user8.setName("곰돌이");
+        user8.setNickname("곰돌이");
+        user8.setEmail("7@naver.com");
+        user8.setPassword("@Qwerqwer");
+        user8.setImageFilename("jj7.jpeg");
+        userJpaRepository.save(user8);
+
+        UserPost userPost12 = new UserPost();
+        userPost12.setUser(user8);
+        userPost12.setPostImageFilename("brave_book_3_1.jpg");
+        userPost12.setIntroTextField("오늘부터 공부....");
+        userPost12.setLikeTextField("좋아요 12개");
+
+        userPostJpaRepository.save(userPost12);
+
+
+        User user9 = new User();
+        user9.setName("김현수");
+        user9.setNickname("현수");
+        user9.setEmail("8@naver.com");
+        user9.setPassword("@Qwerqwer");
+        user9.setImageFilename("jj8.jpeg");
+        userJpaRepository.save(user9);
+
+        User user10 = new User();
+        user10.setName("돌고래");
+        user10.setNickname("고래");
+        user10.setEmail("9@naver.com");
+        user10.setPassword("@Qwerqwer");
+        user10.setImageFilename("jj9.png");
+        userJpaRepository.save(user10);
+
+        User user11 = new User();
+        user11.setName("임하람");
+        user11.setNickname("하람");
+        user11.setEmail("10@naver.com");
+        user11.setPassword("@Qwerqwer");
+        user11.setImageFilename("jj10.jpg");
+        userJpaRepository.save(user11);
+
+
+
+
+
+
+
+
+        jys.setImage(jysProfile);
+
+        gunhee.setImage(gunheeProfile);
+        minkyu.setImage(image1);
+        brave.setImage(braveProfile);
+
+
+
+        Manner mannerA = new Manner();
+        mannerRepository.save(mannerA);
+        minkyu.setManner(mannerA);
+
+        Manner mannerB = new Manner();
+        mannerRepository.save(mannerB);
+        gunhee.setManner(mannerB);
+
+        Manner mannerC = new Manner();
+        mannerRepository.save(mannerC);
+        jys.setManner(mannerC);
+
+        Manner mannerD = new Manner();
+        mannerRepository.save(mannerD);
+        brave.setManner(mannerD);
+
+        memberRepository.save(minkyu);
+        memberRepository.save(gunhee);
+        memberRepository.save(jys);
+        memberRepository.save(brave);
+        // user_id 가 memberA인 멤버의 트랙1: 웹공학트랙, 2트랙을 빅데이터트랙
+        // 프론트에서 pk id가 4인 멤버의 트랙1, 2를 물어본다면?
+
+        Member dummyMemberForSale = new Member("dummyForSale");
+        dummyMemberForSale.setUsername(generateRandomKoreanName());
+        Manner dummyMannerForSale = new Manner();
+        mannerRepository.save(dummyMannerForSale);
+        dummyMemberForSale.setManner(dummyMannerForSale);
+        dummyMemberForSale.setImage(image1);
+        dummyMemberForSale.setFirst_college(CollegeType.IT공과대학);
+        FirstTrack dummyFirstTrackForSale = new FirstTrack(TrackType.사물인터넷트랙, iotCombined);
+        SecondTrack dummySecondTrackForSale = new SecondTrack(TrackType.지능시스템트랙, iotCombined);
+        firstTrackJpaRepository.save(dummyFirstTrackForSale);
+        secondTrackJpaRepository.save(dummySecondTrackForSale);
+        dummyMemberForSale.setFirstTrack(dummyFirstTrackForSale);
+        dummyMemberForSale.setSecondTrack(dummySecondTrackForSale);
+        dummyMemberForSale.setCreatedDate(formattedDate);
+        memberRepository.save(dummyMemberForSale);
+
+        for (int i = 0;i<1;i++) {
+            Member dummyMember = new Member("dummy" + i);
+            dummyMember.setUsername(generateRandomKoreanName());
+            LocalDateTime randomCreatedDate = generateRandomCreatedDate();
+
+            DateTimeFormatter randomMemberDateFormatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
+            String formatted = randomCreatedDate.format(randomMemberDateFormatter);
+            Manner dummyManner = new Manner();
+            mannerRepository.save(dummyManner);
+            dummyMember.setManner(dummyManner);
+            dummyMember.setImage(image1);
+            dummyMember.setFirst_college(CollegeType.IT공과대학);
+            FirstTrack dummyFirstTrack = new FirstTrack(TrackType.사물인터넷트랙, iotCombined);
+            SecondTrack dummySecondTrack = new SecondTrack(TrackType.지능시스템트랙, iotCombined);
+            firstTrackJpaRepository.save(dummyFirstTrack);
+            secondTrackJpaRepository.save(dummySecondTrack);
+            dummyMember.setFirstTrack(dummyFirstTrack);
+            dummyMember.setSecondTrack(dummySecondTrack);
+            dummyMember.setCreatedDate(formatted);
+            memberRepository.save(dummyMember);
+        }
+
+        Category post1category = new Category();
+        Category post2category = new Category();
+        Category post3category = new Category();
+        Category post4category = new Category();
+        Category post5category = new Category();
+
+        post1category.setCategory_type(CategoryType.도서);
+        post2category.setCategory_type(CategoryType.생활가전);
+        post3category.setCategory_type(CategoryType.전자기기);
+        post4category.setCategory_type(CategoryType.전자기기);
+        post5category.setCategory_type(CategoryType.뷰티미용);
+
+        categoryJpaRepository.save(post1category);
+        categoryJpaRepository.save(post2category);
+        categoryJpaRepository.save(post3category);
+        categoryJpaRepository.save(post4category);
+        categoryJpaRepository.save(post5category);
+
+        LocationType[] locations = LocationType.values();
+
+//            our_memory_image1.setPost(post2);
+
+
+
+        Post post1 = new Post();
+        post1.setPost_title("제목1");
+        post1.setPost_text("내용");
+//        Post post1 = new Post("제목1","내용");
+
+
+        Post javaBookPost = new Post();
+        javaBookPost.setPost_title("객지2 교재 팝니다!");
+        javaBookPost.setPost_text("메모 거의 없습니다!");
+
+        Post macBookPost = new Post("오머~ 맥북 프로 싸게 팔아요~","진짜 찐으로 싸게 파는 거라서 가격협상은 힙들어요..");
+        Post bugiPost = new Post("부기 굿즈 팔아요!","부기 팔아요 싸게 파는거에용");
+
+        post1.setWho_posted(minkyu);
+        javaBookPost.setWho_posted(minkyu);
+        macBookPost.setWho_posted(gunhee);
+        bugiPost.setWho_posted(brave);
+
+//        macBookPost.generateRandomCreatedDate();
+
+        post1.setPrice(10000);
+        javaBookPost.setPrice(8000);
+        macBookPost.setPrice(900000);
+        bugiPost.setPrice(2000);
+
+        // Set the created date for macBookPost with the random month, day, and current year (2023)
+
+
+
+
+        // 방금방금
+        //구매목록 하나 만들기금
+        // 멤버 a가올린 포스트를 멤버 b가 사면서 포스트에 구매 목록에 멤버가 멤버b로 바뀜
+      /*  Purchased purchased = new Purchased();
+        purchased.setMember(gunhee);
+        purchasedRepository.save(purchased);
+        post1.setPurchased(purchased);
+        postRepository.savePost(post1);
+
+        Purchased purchased2 = new Purchased();
+        purchased2.setMember(brave);
+        purchasedRepository.save(purchased2);
+       macBookPost.setPurchased(purchased2);*/
+
+
 //        new PostBuilder().setWhoPosted(gunhee)
 //                .setTitle("영상편집 책 팝니다")
 //                .setContext("국방부 진중문고까지 등재된 책입니다.")
@@ -1006,62 +1008,62 @@
 //                .setTrackType(TrackType.모바일소프트웨어트랙)
 //                .setLocationType(LocationType.낙산관)
 //                .build();
+
+
+
+
+        CollegeType[] collegeTypes = CollegeType.values();
+//        post1.setCategory(post1category);
+//        javaBookPost.setCategory(post2category);
+//        macBookPost.setCategory(post3category);
+//        bugiPost.setCategory(post4category);
 //
-//
-//
-//
-//        CollegeType[] collegeTypes = CollegeType.values();
-////        post1.setCategory(post1category);
-////        javaBookPost.setCategory(post2category);
-////        macBookPost.setCategory(post3category);
-////        bugiPost.setCategory(post4category);
-////
-////        post1.setDepartment(department);
-////        javaBookPost.setDepartment(department);
-////        macBookPost.setDepartment(department);
-////        bugiPost.setDepartment(department);
-//
-//        post1.setLocationType(LocationType.공학관);
-//        post1.setLocation_text("101호");
-//        javaBookPost.setLocationType(LocationType.미래관);
-//        javaBookPost.setLocation_text("102호");
-//        macBookPost.setLocationType(LocationType.공학관);
-//        macBookPost.setLocation_text("103호");
-//        bugiPost.setLocationType(LocationType.풋살장);
-//        bugiPost.setLocation_text("104");
-//
-//        post1.setItem_name("MacBook Pro 13");
-//        javaBookPost.setItem_name("아이폰 14 프로 맥스 실버 256GB");
-//        macBookPost.setItem_name("맥북 프로 14");
-//        bugiPost.setItem_name("토비의 스프링 1편");
-//
-//        post1.setTrack(TrackType.게임그래픽디자인트랙);
-//        post1.setCollege(CollegeType.미래융합사회과학대학);
-//        Department department1 = new Department(DepartmentType.AI응용학과);
-//        //post1.setDepartment(department1);
-//
-//
-//        javaBookPost.setTrack(TrackType.경제금융투자트랙);
-//        javaBookPost.setCollege(CollegeType.디자인대학);
-//        Department department2 = new Department(DepartmentType.문학문화콘텐츠학과);
-//        //javaBookPost.setDepartment(department2);
-//
-//        macBookPost.setTrack(TrackType.기업경제분석트랙);
-//        macBookPost.setCollege(CollegeType.미래플러스대학);
-//        Department department3 = new Department(DepartmentType.IT융합공학부);
-//        //macBookPost.setDepartment(department3);
-//
-//        bugiPost.setTrack(TrackType.글로벌비즈니스트랙);
-//        bugiPost.setCollege(CollegeType.IT공과대학);
-//        Department department4 = new Department(DepartmentType.상상력인재학부);
-//        //bugiPost.setDepartment(department4);
-//
-//        departMentJpaRepository.save(department1);
-//        departMentJpaRepository.save(department2);
-//        departMentJpaRepository.save(department3);
-//        departMentJpaRepository.save(department4);
-//
-//        // 도서 1
+//        post1.setDepartment(department);
+//        javaBookPost.setDepartment(department);
+//        macBookPost.setDepartment(department);
+//        bugiPost.setDepartment(department);
+
+        post1.setLocationType(LocationType.공학관);
+        post1.setLocation_text("101호");
+        javaBookPost.setLocationType(LocationType.미래관);
+        javaBookPost.setLocation_text("102호");
+        macBookPost.setLocationType(LocationType.공학관);
+        macBookPost.setLocation_text("103호");
+        bugiPost.setLocationType(LocationType.풋살장);
+        bugiPost.setLocation_text("104");
+
+        post1.setItem_name("MacBook Pro 13");
+        javaBookPost.setItem_name("아이폰 14 프로 맥스 실버 256GB");
+        macBookPost.setItem_name("맥북 프로 14");
+        bugiPost.setItem_name("토비의 스프링 1편");
+
+        post1.setTrack(TrackType.게임그래픽디자인트랙);
+        post1.setCollege(CollegeType.미래융합사회과학대학);
+        Department department1 = new Department(DepartmentType.AI응용학과);
+        //post1.setDepartment(department1);
+
+
+        javaBookPost.setTrack(TrackType.경제금융투자트랙);
+        javaBookPost.setCollege(CollegeType.디자인대학);
+        Department department2 = new Department(DepartmentType.문학문화콘텐츠학과);
+        //javaBookPost.setDepartment(department2);
+
+        macBookPost.setTrack(TrackType.기업경제분석트랙);
+        macBookPost.setCollege(CollegeType.미래플러스대학);
+        Department department3 = new Department(DepartmentType.IT융합공학부);
+        //macBookPost.setDepartment(department3);
+
+        bugiPost.setTrack(TrackType.글로벌비즈니스트랙);
+        bugiPost.setCollege(CollegeType.IT공과대학);
+        Department department4 = new Department(DepartmentType.상상력인재학부);
+        //bugiPost.setDepartment(department4);
+
+        departMentJpaRepository.save(department1);
+        departMentJpaRepository.save(department2);
+        departMentJpaRepository.save(department3);
+        departMentJpaRepository.save(department4);
+
+        // 도서 1
 //        new PostBuilder().setWhoPosted(jys)
 //                .setTitle("토비의 스프링 세트 1,2권 팔아요")
 //                .setContext("토비의 스프링 1권 2권 세트로 팝니다 \n 공부하려고 삿는데 시작도 못햇네요\n" +
@@ -2683,6 +2685,8 @@
 //                .setTrackType(TrackType.모바일소프트웨어트랙)
 //                .setLocationType(LocationType.창의관)
 //                .build();
+//
+//
 //        new PostBuilder().setWhoPosted(gunhee)
 //                .setTitle("Z플립4 크림 256G 자급제폰")
 //                .setContext("핑크 골드, 유심 꽂고 바로 쓰시면 돼요 상태 S급")
@@ -2959,409 +2963,409 @@
 //                .setTrackType(TrackType.모바일소프트웨어트랙)
 //                .setLocationType(LocationType.상상관)
 //                .build();
-//
-//
-//
-//        // 각 카테고리별로 다양한 제목 옵션 저장
-//        Map<CategoryType, List<String>> categoryTitleOptions = new HashMap<>();
-//        categoryTitleOptions.put(CategoryType.패션의류, Arrays.asList(
-//                "세련된 티셔츠",
-//                "다채로운 바지",
-//                "편안한 스웨터",
-//                "스타일리시한 자켓",
-//                "유니크한 원피스",
-//                "캐주얼한 상의",
-//                "스타일리시한 스카프",
-//                "고급스러운 코트",
-//                "모던한 청바지",
-//                "편안한 맨투맨"
-//        ));
-//        categoryTitleOptions.put(CategoryType.부기굿즈, Arrays.asList(
-//                "귀여운 부기인형",
-//                "다채로운 소품",
-//                "부기인형 봉제인형",
-//                "부기인형 컬렉션",
-//                "사랑스러운 아기용품",
-//                "유니크한 부기인형",
-//                "고급스러운 인형",
-//                "흔치 않은 부기인형",
-//                "매력적인 소품",
-//                "귀여운 동물 모양 소품"
-//        ));
-//        categoryTitleOptions.put(CategoryType.도서, Arrays.asList(
-//                "베스트셀러",
-//                "다채로운 책",
-//                "신작 도서",
-//                "추천도서",
-//                "마음을 움직이는 이야기",
-//                "자기계발서",
-//                "유용한 레시피북",
-//                "흥미로운 잡지",
-//                "평화로운 시집",
-//                "인생을 바꿔주는 책"
-//        ));
-//        categoryTitleOptions.put(CategoryType.생활가전, Arrays.asList(
-//                "편리한 가전제품",
-//                "다채로운 생활가전",
-//                "고품질 가전제품",
-//                "스마트 가전제품",
-//                "혁신적인 가전제품",
-//                "유용한 주방가전",
-//                "효율적인 세탁기",
-//                "품질 좋은 냉장고",
-//                "모던한 전자제품",
-//                "스타일리시한 생활가전"
-//        ));
-//        categoryTitleOptions.put(CategoryType.뷰티미용, Arrays.asList(
-//                "화려한 향수",
-//                "다채로운 뷰티 제품",
-//                "고품질 화장품",
-//                "효과적인 스킨케어 제품",
-//                "유용한 메이크업 제품",
-//                "귀여운 화장 솜",
-//                "편리한 뷰티 소품",
-//                "화려한 네일 아트",
-//                "피부를 촉촉하게 해주는 제품",
-//                "스타일리시한 뷰티 아이템"
-//        ));
-//        categoryTitleOptions.put(CategoryType.필기구, Arrays.asList(
-//                "고급스러운 연필",
-//                "다채로운 필기구",
-//                "고품질 볼펜",
-//                "편안한 쓰기 도구",
-//                "화려한 마커",
-//                "귀여운 스티커",
-//                "효과적인 책갈피",
-//                "편리한 지우개",
-//                "스타일리시한 문구용품",
-//                "유니크한 필기 도구"
-//        ));
-//        categoryTitleOptions.put(CategoryType.전자기기, Arrays.asList(
-//                "고품질 맥북",
-//                "다채로운 전자기기",
-//                "신형 노트북",
-//                "편리한 스마트폰",
-//                "혁신적인 태블릿",
-//                "유용한 노트북 악세사리",
-//                "고품질 이어폰",
-//                "화려한 스마트워치",
-//                "스타일리시한 헤드폰",
-//                "편안한 이어팟"
-//        ));
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//        for (int i =0;i<50000;i++) {
-//            Post dummyPost = new Post();
-//            int randomIndex = random.nextInt(collegeTypes.length);
-//
-//            // 랜덤 CollegeType 설정
-//            dummyPost.setCollege(collegeTypes[randomIndex]);
-//            String salePhrase = salePhrases[new Random().nextInt(salePhrases.length)];
-//
-//
-//            // 랜덤 카테고리 설정
-//            Category randomCategory = new Category();
-//            randomCategory.setCategory_type(categories[random.nextInt(categories.length)]);
-//            categoryJpaRepository.save(randomCategory);
-//
-//            //dummyPost.setCategory(randomCategory);
-//            dummyPost.setCategoryType(categories[random.nextInt(categories.length)]);
-//
-//
-//            List<String> titleOptions = categoryTitleOptions.get(dummyPost.getCategoryType());
-//            String randomTitle = titleOptions.get(random.nextInt(titleOptions.size()));
-//
-//            dummyPost.setPost_title(randomTitle +" " +salePhrase);
-//            dummyPost.setPost_text("게시글 내용");
-//
-//
-//            dummyPost.setWho_posted(dummyMemberForSale);
-//            dummyPost.setPrice(10000);
-//
-//            Department dummyDepartment = new Department();
-//            dummyDepartment.setDepartmentType(departmentTypes[random.nextInt(departmentTypes.length)]);
-//            departMentJpaRepository.save(dummyDepartment);
-//            //dummyPost.setDepartment(dummyDepartment);
-//            dummyPost.setDepartmentType(departmentTypes[random.nextInt(departmentTypes.length)]);
-//
-//            dummyPost.setLocationType(locations[random.nextInt(locations.length)]);
-//            dummyPost.setLocation_text("101호");
-//            dummyPost.generateRandomCreatedDate();
-//
-//            dummyPost.setItem_name("MacBook Pro 13");
-//
-//            if (i % 999 == 0) {
-//                Purchased dummyPurchased = new Purchased();
-//                dummyPurchased.setMember(brave);
-////                dummyPurchased.setPrice(dummyPost.getPrice());
-//                dummyPurchased.setPrice(i);
-//                dummyPurchased.setPostTitle(dummyPost.getPost_title());
-//                dummyPurchased.setItem_name("부기굿즈");
-//                dummyPurchased.setQuantity(1);
-//                dummyPurchased.setTid(UUID.randomUUID().toString());
-//                dummyPurchased.setBuyer_username(gunhee.getUsername());
-//                purchasedRepository.save(dummyPurchased);
-//                dummyPost.setPurchased(dummyPurchased);
-//                dummyPost.setStatus(StatusType.거래완료);
-//            }
-//            else{
-//                dummyPost.setStatus(StatusType.판매중);
-//            }
-//
-//
-//            postRepository.savePost(dummyPost);
-//            ArrayList<String> image_list = new ArrayList<>();
-//
-//
-//            if (dummyPost.getCategoryType() == CategoryType.패션의류) {
-//                Image dummyImage0 = new Image();
-//                Image dummyImage1 = new Image();
-//                Image dummyImage2 = new Image();
-//                int randomNumber = random.nextInt(3) + 1;
-//                dummyImage0.setImageFilename("clothes" + randomNumber + "_0.jpg");
-//                dummyImage1.setImageFilename("clothes" + randomNumber + "_1.jpg");
-//                dummyImage2.setImageFilename("clothes" + randomNumber + "_2.jpg");
-//                image_list.add("clothes" + randomNumber + "_0.jpg");
-//                image_list.add("clothes" + randomNumber + "_1.jpg");
-//                image_list.add("clothes" + randomNumber + "_2.jpg");
-//
-//                dummyImage0.setPost(dummyPost);
-//                dummyImage1.setPost(dummyPost);
-//                dummyImage2.setPost(dummyPost);
-//                imageRepository.save(dummyImage0);
-//                imageRepository.save(dummyImage1);
-//                imageRepository.save(dummyImage2);
-//            } else if (dummyPost.getCategoryType() == CategoryType.부기굿즈) {
-//                Image dummyImage = new Image();
-//                int randomNumber = random.nextInt(3) + 1;
-//
-//                dummyImage.setImageFilename("boggie" + randomNumber + ".png");
-//                image_list.add("boggie" + randomNumber + ".png");
-//                dummyImage.setPost(dummyPost);
-//                imageRepository.save(dummyImage);
-//            } else if (dummyPost.getCategoryType() == CategoryType.전자기기) {
-//                Image dummyImage0 = new Image();
-//                Image dummyImage1 = new Image();
-//                Image dummyImage2 = new Image();
-//                int randomNumber = random.nextInt(3) + 1;
-//                dummyImage0.setImageFilename("elec" + randomNumber + "_0.jpeg");
-//                dummyImage1.setImageFilename("elec" + randomNumber + "_1.jpeg");
-//                dummyImage2.setImageFilename("elec" + randomNumber + "_2.jpeg");
-//
-//                image_list.add("elec" + randomNumber + "_0.jpeg");
-//                image_list.add("elec" + randomNumber + "_1.jpeg");
-//                image_list.add("elec" + randomNumber + "_2.jpeg");
-//
-//                dummyImage0.setPost(dummyPost);
-//                dummyImage1.setPost(dummyPost);
-//                dummyImage2.setPost(dummyPost);
-//                imageRepository.save(dummyImage0);
-//                imageRepository.save(dummyImage1);
-//                imageRepository.save(dummyImage2);
-//            } else if (dummyPost.getCategoryType() == CategoryType.뷰티미용) {
-//
-//                Image dummyImage0 = new Image();
-//                Image dummyImage1 = new Image();
-//                Image dummyImage2 = new Image();
-//                int randomNumber = random.nextInt(3) + 1;
-//                dummyImage0.setImageFilename("beauty" + randomNumber + "_0.webp");
-//                dummyImage1.setImageFilename("beauty" + randomNumber + "_1.webp");
-//                dummyImage2.setImageFilename("beauty" + randomNumber + "_2.webp");
-//
-//                image_list.add("beauty" + randomNumber + "_0.webp");
-//                image_list.add("beauty" + randomNumber + "_1.webp");
-//                image_list.add("beauty" + randomNumber + "_2.webp");
-//
-//                dummyImage0.setPost(dummyPost);
-//                dummyImage1.setPost(dummyPost);
-//                dummyImage2.setPost(dummyPost);
-//                imageRepository.save(dummyImage0);
-//                imageRepository.save(dummyImage1);
-//                imageRepository.save(dummyImage2);
-//            } else if (dummyPost.getCategoryType() == CategoryType.도서) {
-//                Image dummyImage = new Image();
-//                int randomNumber = random.nextInt(5) + 1;
-//                dummyImage.setImageFilename("book" + randomNumber + ".jpeg");
-//
-//                image_list.add("book" + randomNumber + ".jpeg");
-//
-//
-//                dummyImage.setPost(dummyPost);
-//                imageRepository.save(dummyImage);
-//            } else if (dummyPost.getCategoryType() == CategoryType.필기구) {
-//                Image dummyImage = new Image();
-//                dummyImage.setImageFilename("writing_implement1.png");
-//                dummyImage.setPost(dummyPost);
-//                image_list.add("writing_implement1.png");
-//
-//                imageRepository.save(dummyImage);
-//            } else if (dummyPost.getCategoryType() == CategoryType.생활가전) {
-//                Image dummyImage = new Image();
-//                int randomNumber = random.nextInt(5) + 1;
-//                dummyImage.setImageFilename("appliances" + randomNumber + ".jpeg");
-//                image_list.add("appliances" + randomNumber + ".jpeg");
-//
-//                dummyImage.setPost(dummyPost);
-//                imageRepository.save(dummyImage);
-//            }
-//
-//
-//
-//
-//            PostDocument pd = new PostDocument(dummyPost);
-//
-//            if(dummyPost.getPurchased() != null){
-//                pd.setPurchase_id(dummyPost.getPurchased().getId());
-//            }
-//
-//
-//            for(String str :image_list){
-//                pd.getImages().add(str);
-//            }
-//
-//            postDocumentRepository.save(pd);
-//
-//        }
-//
-//
-//    }
-//
-//
-//
-//
-//
-//    @Data
-//    static class ChatRoomResponse {
-//        private String sender;
-//        private String receiver;
-//
-//        public ChatRoomResponse(String memberA, String memberB) {
-//            this.sender = memberA;
-//            this.receiver = memberB;
-//        }
-//    }
-//
-//    @Data
-//    static class ChaRoomResponse {
-//        private String usernameA;
-//        private String usernameB;
-//        private String message;
-//
-//        public ChaRoomResponse(Post post, ChatMessage chatMessage) {
-//            this.usernameA = post.getWho_posted().getUsername();
-//            this.usernameB = chatMessage.getMember().getUsername();
-//            this.message = chatMessage.getMessage();
-//        }
-//    }
-//    public class PostBuilder {
-//        private Member whoPosted;
-//        private String title;
-//        private String context;
-//        private String itemName;
-//        private ArrayList<String> imageFilenames = new ArrayList<>();
-//        private int price;
-//        private CategoryType categoryType;
-//        private DepartmentType departmentType;
-//        private LocationType locationType;
-//
-//        private TrackType trackType;
-//        private LocalDateTime createdDate;
-//
-//
-//
-//        public PostBuilder setWhoPosted(Member whoPosted) {
-//            this.whoPosted = whoPosted;
-//            return this;
-//        }
-//
-//        public PostBuilder setTrackType(TrackType trackType) {
-//            this.trackType = trackType;
-//            return this;
-//        }
-//
-//        public PostBuilder setTitle(String title) {
-//            this.title = title;
-//            return this;
-//        }
-//
-//        public PostBuilder setContext(String context) {
-//            this.context = context;
-//            return this;
-//        }
-//
-//        public PostBuilder setItemName(String itemName) {
-//            this.itemName = itemName;
-//            return this;
-//        }
-//
-//        public PostBuilder addImageFilename(String imageFilename) {
-//            this.imageFilenames.add(imageFilename);
-//            return this;
-//        }
-//
-//        public PostBuilder setPrice(int price) {
-//            this.price = price;
-//            return this;
-//        }
-//        public void generateRandomCreatedDate() {
-//            // Generate random month within the range of 1 (January) to 12 (December)
-//            int randomMonth = ThreadLocalRandom.current().nextInt(1, 13);
-//
-//            // Generate random day within the range of 1 to 28 (assumes a non-leap year)
-//            int randomDay = ThreadLocalRandom.current().nextInt(1, 29);
-//            this.createdDate = LocalDateTime.of(2023, randomMonth, randomDay, 0, 0);
-//        }
-//        public PostBuilder setCategoryType(CategoryType categoryType) {
-//            this.categoryType = categoryType;
-//            return this;
-//        }
-//
-//        public PostBuilder setDepartmentType(DepartmentType departmentType) {
-//            this.departmentType = departmentType;
-//            return this;
-//        }
-//
-//        public PostBuilder setLocationType(LocationType locationType) {
-//            this.locationType = locationType;
-//            return this;
-//        }
-//
-//        public void build() {
-//            Post hardcodePost = new Post();
-//            hardcodePost.setPost_title(title);
-//            hardcodePost.setPost_text(context);
-//            hardcodePost.setWho_posted(whoPosted);
-//            hardcodePost.setItem_name(itemName);
-//            hardcodePost.setPrice(price);
-//            hardcodePost.setTrack(trackType);
-//
-//            Category category = new Category();
-//            category.setCategory_type(categoryType);
-//            categoryJpaRepository.save(category);
-//            //hardcodePost.setCategory(category);
-//
-//            Department department = new Department(departmentType);
-//            departMentJpaRepository.save(department);
-//            //hardcodePost.setDepartment(department);
-//            hardcodePost.setLocationType(locationType);
-//
-//            postRepository.savePost(hardcodePost);
-//
-//            for(String imageFilename : imageFilenames) {
-//                Image imageHard = new Image();
-//                imageHard.setImageFilename(imageFilename);
-//                imageHard.setPost(hardcodePost);
-//                imageRepository.save(imageHard);
-//            }
-//        }
-//    }
-//}
-//
+
+
+
+        // 각 카테고리별로 다양한 제목 옵션 저장
+        Map<CategoryType, List<String>> categoryTitleOptions = new HashMap<>();
+        categoryTitleOptions.put(CategoryType.패션의류, Arrays.asList(
+                "세련된 티셔츠",
+                "다채로운 바지",
+                "편안한 스웨터",
+                "스타일리시한 자켓",
+                "유니크한 원피스",
+                "캐주얼한 상의",
+                "스타일리시한 스카프",
+                "고급스러운 코트",
+                "모던한 청바지",
+                "편안한 맨투맨"
+        ));
+        categoryTitleOptions.put(CategoryType.부기굿즈, Arrays.asList(
+                "귀여운 부기인형",
+                "다채로운 소품",
+                "부기인형 봉제인형",
+                "부기인형 컬렉션",
+                "사랑스러운 아기용품",
+                "유니크한 부기인형",
+                "고급스러운 인형",
+                "흔치 않은 부기인형",
+                "매력적인 소품",
+                "귀여운 동물 모양 소품"
+        ));
+        categoryTitleOptions.put(CategoryType.도서, Arrays.asList(
+                "베스트셀러",
+                "다채로운 책",
+                "신작 도서",
+                "추천도서",
+                "마음을 움직이는 이야기",
+                "자기계발서",
+                "유용한 레시피북",
+                "흥미로운 잡지",
+                "평화로운 시집",
+                "인생을 바꿔주는 책"
+        ));
+        categoryTitleOptions.put(CategoryType.생활가전, Arrays.asList(
+                "편리한 가전제품",
+                "다채로운 생활가전",
+                "고품질 가전제품",
+                "스마트 가전제품",
+                "혁신적인 가전제품",
+                "유용한 주방가전",
+                "효율적인 세탁기",
+                "품질 좋은 냉장고",
+                "모던한 전자제품",
+                "스타일리시한 생활가전"
+        ));
+        categoryTitleOptions.put(CategoryType.뷰티미용, Arrays.asList(
+                "화려한 향수",
+                "다채로운 뷰티 제품",
+                "고품질 화장품",
+                "효과적인 스킨케어 제품",
+                "유용한 메이크업 제품",
+                "귀여운 화장 솜",
+                "편리한 뷰티 소품",
+                "화려한 네일 아트",
+                "피부를 촉촉하게 해주는 제품",
+                "스타일리시한 뷰티 아이템"
+        ));
+        categoryTitleOptions.put(CategoryType.필기구, Arrays.asList(
+                "고급스러운 연필",
+                "다채로운 필기구",
+                "고품질 볼펜",
+                "편안한 쓰기 도구",
+                "화려한 마커",
+                "귀여운 스티커",
+                "효과적인 책갈피",
+                "편리한 지우개",
+                "스타일리시한 문구용품",
+                "유니크한 필기 도구"
+        ));
+        categoryTitleOptions.put(CategoryType.전자기기, Arrays.asList(
+                "고품질 맥북",
+                "다채로운 전자기기",
+                "신형 노트북",
+                "편리한 스마트폰",
+                "혁신적인 태블릿",
+                "유용한 노트북 악세사리",
+                "고품질 이어폰",
+                "화려한 스마트워치",
+                "스타일리시한 헤드폰",
+                "편안한 이어팟"
+        ));
+
+
+
+
+
+
+
+
+
+
+        for (int i =0;i<50000;i++) {
+            Post dummyPost = new Post();
+            int randomIndex = random.nextInt(collegeTypes.length);
+
+            // 랜덤 CollegeType 설정
+            dummyPost.setCollege(collegeTypes[randomIndex]);
+            String salePhrase = salePhrases[new Random().nextInt(salePhrases.length)];
+
+
+            // 랜덤 카테고리 설정
+            Category randomCategory = new Category();
+            randomCategory.setCategory_type(categories[random.nextInt(categories.length)]);
+            categoryJpaRepository.save(randomCategory);
+
+            //dummyPost.setCategory(randomCategory);
+            dummyPost.setCategoryType(categories[random.nextInt(categories.length)]);
+
+
+            List<String> titleOptions = categoryTitleOptions.get(dummyPost.getCategoryType());
+            String randomTitle = titleOptions.get(random.nextInt(titleOptions.size()));
+
+            dummyPost.setPost_title(randomTitle +" " +salePhrase);
+            dummyPost.setPost_text("게시글 내용");
+
+
+            dummyPost.setWho_posted(dummyMemberForSale);
+            dummyPost.setPrice(10000);
+
+            Department dummyDepartment = new Department();
+            dummyDepartment.setDepartmentType(departmentTypes[random.nextInt(departmentTypes.length)]);
+            departMentJpaRepository.save(dummyDepartment);
+            //dummyPost.setDepartment(dummyDepartment);
+            dummyPost.setDepartmentType(departmentTypes[random.nextInt(departmentTypes.length)]);
+
+            dummyPost.setLocationType(locations[random.nextInt(locations.length)]);
+            dummyPost.setLocation_text("101호");
+            dummyPost.generateRandomCreatedDate();
+
+            dummyPost.setItem_name("MacBook Pro 13");
+
+            if (i % 999 == 0) {
+                Purchased dummyPurchased = new Purchased();
+                dummyPurchased.setMember(brave);
+//                dummyPurchased.setPrice(dummyPost.getPrice());
+                dummyPurchased.setPrice(i);
+                dummyPurchased.setPostTitle(dummyPost.getPost_title());
+                dummyPurchased.setItem_name("부기굿즈");
+                dummyPurchased.setQuantity(1);
+                dummyPurchased.setTid(UUID.randomUUID().toString());
+                dummyPurchased.setBuyer_username(gunhee.getUsername());
+                purchasedRepository.save(dummyPurchased);
+                dummyPost.setPurchased(dummyPurchased);
+                dummyPost.setStatus(StatusType.거래완료);
+            }
+            else{
+                dummyPost.setStatus(StatusType.판매중);
+            }
+
+
+            postRepository.savePost(dummyPost);
+            ArrayList<String> image_list = new ArrayList<>();
+
+
+            if (dummyPost.getCategoryType() == CategoryType.패션의류) {
+                Image dummyImage0 = new Image();
+                Image dummyImage1 = new Image();
+                Image dummyImage2 = new Image();
+                int randomNumber = random.nextInt(3) + 1;
+                dummyImage0.setImageFilename("clothes" + randomNumber + "_0.jpg");
+                dummyImage1.setImageFilename("clothes" + randomNumber + "_1.jpg");
+                dummyImage2.setImageFilename("clothes" + randomNumber + "_2.jpg");
+                image_list.add("clothes" + randomNumber + "_0.jpg");
+                image_list.add("clothes" + randomNumber + "_1.jpg");
+                image_list.add("clothes" + randomNumber + "_2.jpg");
+
+                dummyImage0.setPost(dummyPost);
+                dummyImage1.setPost(dummyPost);
+                dummyImage2.setPost(dummyPost);
+                imageRepository.save(dummyImage0);
+                imageRepository.save(dummyImage1);
+                imageRepository.save(dummyImage2);
+            } else if (dummyPost.getCategoryType() == CategoryType.부기굿즈) {
+                Image dummyImage = new Image();
+                int randomNumber = random.nextInt(3) + 1;
+
+                dummyImage.setImageFilename("boggie" + randomNumber + ".png");
+                image_list.add("boggie" + randomNumber + ".png");
+                dummyImage.setPost(dummyPost);
+                imageRepository.save(dummyImage);
+            } else if (dummyPost.getCategoryType() == CategoryType.전자기기) {
+                Image dummyImage0 = new Image();
+                Image dummyImage1 = new Image();
+                Image dummyImage2 = new Image();
+                int randomNumber = random.nextInt(3) + 1;
+                dummyImage0.setImageFilename("elec" + randomNumber + "_0.jpeg");
+                dummyImage1.setImageFilename("elec" + randomNumber + "_1.jpeg");
+                dummyImage2.setImageFilename("elec" + randomNumber + "_2.jpeg");
+
+                image_list.add("elec" + randomNumber + "_0.jpeg");
+                image_list.add("elec" + randomNumber + "_1.jpeg");
+                image_list.add("elec" + randomNumber + "_2.jpeg");
+
+                dummyImage0.setPost(dummyPost);
+                dummyImage1.setPost(dummyPost);
+                dummyImage2.setPost(dummyPost);
+                imageRepository.save(dummyImage0);
+                imageRepository.save(dummyImage1);
+                imageRepository.save(dummyImage2);
+            } else if (dummyPost.getCategoryType() == CategoryType.뷰티미용) {
+
+                Image dummyImage0 = new Image();
+                Image dummyImage1 = new Image();
+                Image dummyImage2 = new Image();
+                int randomNumber = random.nextInt(3) + 1;
+                dummyImage0.setImageFilename("beauty" + randomNumber + "_0.webp");
+                dummyImage1.setImageFilename("beauty" + randomNumber + "_1.webp");
+                dummyImage2.setImageFilename("beauty" + randomNumber + "_2.webp");
+
+                image_list.add("beauty" + randomNumber + "_0.webp");
+                image_list.add("beauty" + randomNumber + "_1.webp");
+                image_list.add("beauty" + randomNumber + "_2.webp");
+
+                dummyImage0.setPost(dummyPost);
+                dummyImage1.setPost(dummyPost);
+                dummyImage2.setPost(dummyPost);
+                imageRepository.save(dummyImage0);
+                imageRepository.save(dummyImage1);
+                imageRepository.save(dummyImage2);
+            } else if (dummyPost.getCategoryType() == CategoryType.도서) {
+                Image dummyImage = new Image();
+                int randomNumber = random.nextInt(5) + 1;
+                dummyImage.setImageFilename("book" + randomNumber + ".jpeg");
+
+                image_list.add("book" + randomNumber + ".jpeg");
+
+
+                dummyImage.setPost(dummyPost);
+                imageRepository.save(dummyImage);
+            } else if (dummyPost.getCategoryType() == CategoryType.필기구) {
+                Image dummyImage = new Image();
+                dummyImage.setImageFilename("writing_implement1.png");
+                dummyImage.setPost(dummyPost);
+                image_list.add("writing_implement1.png");
+
+                imageRepository.save(dummyImage);
+            } else if (dummyPost.getCategoryType() == CategoryType.생활가전) {
+                Image dummyImage = new Image();
+                int randomNumber = random.nextInt(5) + 1;
+                dummyImage.setImageFilename("appliances" + randomNumber + ".jpeg");
+                image_list.add("appliances" + randomNumber + ".jpeg");
+
+                dummyImage.setPost(dummyPost);
+                imageRepository.save(dummyImage);
+            }
+
+
+
+
+            PostDocument pd = new PostDocument(dummyPost);
+
+            if(dummyPost.getPurchased() != null){
+                pd.setPurchase_id(dummyPost.getPurchased().getId());
+            }
+
+
+            for(String str :image_list){
+                pd.getImages().add(str);
+            }
+
+            postDocumentRepository.save(pd);
+
+        }
+
+
+    }
+
+
+
+
+
+    @Data
+    static class ChatRoomResponse {
+        private String sender;
+        private String receiver;
+
+        public ChatRoomResponse(String memberA, String memberB) {
+            this.sender = memberA;
+            this.receiver = memberB;
+        }
+    }
+
+    @Data
+    static class ChaRoomResponse {
+        private String usernameA;
+        private String usernameB;
+        private String message;
+
+        public ChaRoomResponse(Post post, ChatMessage chatMessage) {
+            this.usernameA = post.getWho_posted().getUsername();
+            this.usernameB = chatMessage.getMember().getUsername();
+            this.message = chatMessage.getMessage();
+        }
+    }
+    public class PostBuilder {
+        private Member whoPosted;
+        private String title;
+        private String context;
+        private String itemName;
+        private ArrayList<String> imageFilenames = new ArrayList<>();
+        private int price;
+        private CategoryType categoryType;
+        private DepartmentType departmentType;
+        private LocationType locationType;
+
+        private TrackType trackType;
+        private LocalDateTime createdDate;
+
+
+
+        public PostBuilder setWhoPosted(Member whoPosted) {
+            this.whoPosted = whoPosted;
+            return this;
+        }
+
+        public PostBuilder setTrackType(TrackType trackType) {
+            this.trackType = trackType;
+            return this;
+        }
+
+        public PostBuilder setTitle(String title) {
+            this.title = title;
+            return this;
+        }
+
+        public PostBuilder setContext(String context) {
+            this.context = context;
+            return this;
+        }
+
+        public PostBuilder setItemName(String itemName) {
+            this.itemName = itemName;
+            return this;
+        }
+
+        public PostBuilder addImageFilename(String imageFilename) {
+            this.imageFilenames.add(imageFilename);
+            return this;
+        }
+
+        public PostBuilder setPrice(int price) {
+            this.price = price;
+            return this;
+        }
+        public void generateRandomCreatedDate() {
+            // Generate random month within the range of 1 (January) to 12 (December)
+            int randomMonth = ThreadLocalRandom.current().nextInt(1, 13);
+
+            // Generate random day within the range of 1 to 28 (assumes a non-leap year)
+            int randomDay = ThreadLocalRandom.current().nextInt(1, 29);
+            this.createdDate = LocalDateTime.of(2023, randomMonth, randomDay, 0, 0);
+        }
+        public PostBuilder setCategoryType(CategoryType categoryType) {
+            this.categoryType = categoryType;
+            return this;
+        }
+
+        public PostBuilder setDepartmentType(DepartmentType departmentType) {
+            this.departmentType = departmentType;
+            return this;
+        }
+
+        public PostBuilder setLocationType(LocationType locationType) {
+            this.locationType = locationType;
+            return this;
+        }
+
+        public void build() {
+            Post hardcodePost = new Post();
+            hardcodePost.setPost_title(title);
+            hardcodePost.setPost_text(context);
+            hardcodePost.setWho_posted(whoPosted);
+            hardcodePost.setItem_name(itemName);
+            hardcodePost.setPrice(price);
+            hardcodePost.setTrack(trackType);
+
+            Category category = new Category();
+            category.setCategory_type(categoryType);
+            categoryJpaRepository.save(category);
+            //hardcodePost.setCategory(category);
+
+            Department department = new Department(departmentType);
+            departMentJpaRepository.save(department);
+            //hardcodePost.setDepartment(department);
+            hardcodePost.setLocationType(locationType);
+
+            postRepository.savePost(hardcodePost);
+
+            for(String imageFilename : imageFilenames) {
+                Image imageHard = new Image();
+                imageHard.setImageFilename(imageFilename);
+                imageHard.setPost(hardcodePost);
+                imageRepository.save(imageHard);
+            }
+        }
+    }
+}
+

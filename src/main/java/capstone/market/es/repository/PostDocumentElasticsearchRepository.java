@@ -1,7 +1,8 @@
-package capstone.market.repository;
+package capstone.market.es.repository;
 
-import capstone.market.domain.*;
-import capstone.market.profile_dto.SearchFilterDto;
+import capstone.market.es.dto.PostDocumentDTO;
+import capstone.market.profile_dto.SearchFilterDto2;
+import lombok.RequiredArgsConstructor;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -15,51 +16,52 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 @Repository
+@RequiredArgsConstructor
 public class PostDocumentElasticsearchRepository {
 
     private final RestHighLevelClient elasticsearchClient;
 
-    @Autowired
-    public PostDocumentElasticsearchRepository (RestHighLevelClient elasticsearchClient) {
-        this.elasticsearchClient = elasticsearchClient;
-    }
-
-
 
     @Cacheable("post_documents") // 레디스 캐싱을 위해 어노테이션 설정
-    public List<PostDocumentDTO> searchFilterWithPaging3 (SearchFilterDto searchFilterDto) throws IOException {
+    public List<PostDocumentDTO> search (SearchFilterDto2 searchFilterDto) throws IOException {
         SearchRequest searchRequest = new SearchRequest("post"); // Elasticsearch에서 사용되는 인덱스명
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 
+
         // 트랙
         if (searchFilterDto.getTrack() != null && !searchFilterDto.getTrack().toString().isEmpty()) {
-            boolQueryBuilder.filter(QueryBuilders.termQuery("track", searchFilterDto.getTrack().toString()));
+            boolQueryBuilder.filter(QueryBuilders.termQuery("track", searchFilterDto.getTrack()));
         }
+
         // 대학
         if (searchFilterDto.getCollegeType() != null && !searchFilterDto.getCollegeType().toString().isEmpty()) {
-            boolQueryBuilder.filter(QueryBuilders.termQuery("college", searchFilterDto.getCollegeType().toString()));
+            boolQueryBuilder.filter(QueryBuilders.termQuery("college", searchFilterDto.getCollegeType()));
         }
+
         // 카테고리 => list 여서 terms query
         if (searchFilterDto.getCategories() != null && !searchFilterDto.getCategories().isEmpty()) {
-            boolQueryBuilder.filter(QueryBuilders.termsQuery("category", searchFilterDto.getCategories().toString()));
+            boolQueryBuilder.filter(QueryBuilders.termsQuery("category", searchFilterDto.getCategories()));
         }
+
 
         // 거래 장소 => list 여서 terms query
         if (searchFilterDto.getLocations() != null && !searchFilterDto.getLocations().isEmpty()) {
-            boolQueryBuilder.filter(QueryBuilders.termsQuery("locationType", searchFilterDto.getLocations().toString()));
+
+            boolQueryBuilder.filter(QueryBuilders.termsQuery("locationType", searchFilterDto.getLocations()));
+
+
         }
 
         // 학부 => list 여서 terms query
         if (searchFilterDto.getDepartments() != null && !searchFilterDto.getDepartments().isEmpty()) {
-            boolQueryBuilder.filter(QueryBuilders.termsQuery("department", searchFilterDto.getDepartments().toString()));
+            boolQueryBuilder.filter(QueryBuilders.termsQuery("department", searchFilterDto.getDepartments()));
         }
 
 

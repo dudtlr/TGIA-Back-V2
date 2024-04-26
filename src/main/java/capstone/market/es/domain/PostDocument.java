@@ -1,5 +1,6 @@
-package capstone.market.domain;
+package capstone.market.es.domain;
 
+import capstone.market.domain.Post;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.*;

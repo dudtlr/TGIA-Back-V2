@@ -1,6 +1,6 @@
-package capstone.market.repository;
+package capstone.market.es.repository;
 
-import capstone.market.domain.PostDocument;
+import capstone.market.es.domain.PostDocument;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 public interface PostDocumentRepository extends ElasticsearchRepository<PostDocument, Long> {
 

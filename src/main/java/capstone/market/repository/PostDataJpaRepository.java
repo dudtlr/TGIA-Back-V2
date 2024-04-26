@@ -13,7 +13,7 @@ import java.util.List;
 
 @Repository
 @Transactional
-public interface PostDataJpaRepository extends JpaRepository<Post, Long> , PostRepositoryCustom{
+public interface PostDataJpaRepository extends JpaRepository<Post, Long> , PostRepositoryCustom {
     List<ChatRoom> findChatRoomsByPostId(Long postId);
 
     List<Post> findAllByOrderByCreatedDateDesc(Pageable pageable);

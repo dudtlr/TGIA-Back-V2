@@ -6,10 +6,8 @@ import capstone.market.profile_dto.SearchFilterDto;
 import com.querydsl.core.BooleanBuilder;
 
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.core.types.dsl.NumberTemplate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.Data;
@@ -18,26 +16,26 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.querydsl.core.types.dsl.Expressions.numberTemplate;
+
 
 @RequiredArgsConstructor
 @Data
 @Transactional(readOnly = true)
+@Repository
 public class PostRepositoryCustomImpl implements PostRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
 
             @Override
-            //@Cacheable("searchResults")
+            @Cacheable("searchResults")
             public List<PostDetailDto> searchFilterWithPaging(SearchFilterDto searchFilterDto) {
 
                 QPost post = QPost.post;

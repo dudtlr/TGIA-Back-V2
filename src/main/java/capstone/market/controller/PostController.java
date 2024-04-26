@@ -2,26 +2,19 @@ package capstone.market.controller;
 
 import capstone.market.domain.*;
 
+import capstone.market.es.dto.PostDocumentDTO;
 import capstone.market.post_dto.*;
 
 
-import capstone.market.profile_dto.PostDetailDto;
-import capstone.market.profile_dto.PostSellDetailDto;
-import capstone.market.profile_dto.ProfileListDto;
-import capstone.market.profile_dto.SearchFilterDto;
+import capstone.market.profile_dto.*;
 import capstone.market.service.*;
-import capstone.market.session.SessionConst;
 import capstone.market.session.SessionManager;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.action.search.SearchResponse;
 import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,13 +48,7 @@ public class PostController {
         return postDetailDtos;
     }
 
-    @PostMapping("/detailSearchWithPaging3")
-    public List<PostDocumentDTO> SearchWithPaging3(@RequestBody SearchFilterDto searchFilterDto) throws IOException {
 
-        List<PostDocumentDTO> postDocuments = postService.searchFilterWithPaging3(searchFilterDto);
-
-        return postDocuments;
-    }
 
     @PostMapping("/reservation_posts")
     public void reservatePosts(@RequestBody PostDetailDto postDetailDto){
