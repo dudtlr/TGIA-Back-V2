@@ -41,8 +41,8 @@ public class PostController {
 
 
 
-    @PostMapping("/detailSearchWithPaging")
-    public List<PostDetailDto> SearchWithPaging(@RequestBody SearchFilterDto searchFilterDto) {
+    @GetMapping("/detailSearchWithPaging")
+    public List<PostDetailDto> SearchWithPaging (SearchFilterDto searchFilterDto) {
 
         List<PostDetailDto> postDetailDtos = postService.searchFilterWithPaging(searchFilterDto);
         return postDetailDtos;

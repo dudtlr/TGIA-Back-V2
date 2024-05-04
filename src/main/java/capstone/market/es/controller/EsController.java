@@ -20,50 +20,11 @@ public class EsController {
 
     private final EsService esService;
 
+
     @GetMapping("/es_search")
     public List<PostDocumentDTO> search(
-            @RequestParam(required = false) List<String> categories,
-            @RequestParam(required = false) List<String> locations,
-            @RequestParam(required = false) List<String> departments,
-            @RequestParam(required = false) String track,
-            @RequestParam(required = false) String collegeType,
-            @RequestParam(required = false) String sort,
-            @RequestParam(required = false) String keyword,
-            @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "20") Integer size
+            SearchFilterDto2 searchFilterDto
     ) throws IOException {
-
-        SearchFilterDto2 searchFilterDto = new SearchFilterDto2();
-
-        if (categories != null && !categories.isEmpty()) {
-            searchFilterDto.setCategories(categories);
-        }
-        if (locations != null && !locations.isEmpty()) {
-            searchFilterDto.setLocations(locations);
-        }
-        if (departments != null && !departments.isEmpty()) {
-            searchFilterDto.setDepartments(departments);
-        }
-        if (track != null) {
-            searchFilterDto.setTrack(track);
-        }
-        if (collegeType != null) {
-            searchFilterDto.setCollegeType(collegeType);
-        }
-
-        if (sort != null) {
-            searchFilterDto.setSort(sort);
-        }
-        if (keyword != null) {
-            searchFilterDto.setKeyword(keyword);
-        }
-        searchFilterDto.setPage(page);
-
-        searchFilterDto.setSize(size);
-
-
-
-
 
         List<PostDocumentDTO> postDocuments = esService.search(searchFilterDto);
 

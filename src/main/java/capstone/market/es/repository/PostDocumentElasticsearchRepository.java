@@ -28,7 +28,7 @@ public class PostDocumentElasticsearchRepository {
     private final RestHighLevelClient elasticsearchClient;
 
 
-    @Cacheable("post_documents") // 레디스 캐싱을 위해 어노테이션 설정
+    //@Cacheable("post_documents") // 레디스 캐싱을 위해 어노테이션 설정
     public List<PostDocumentDTO> search (SearchFilterDto2 searchFilterDto) throws IOException {
         SearchRequest searchRequest = new SearchRequest("post"); // Elasticsearch에서 사용되는 인덱스명
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();

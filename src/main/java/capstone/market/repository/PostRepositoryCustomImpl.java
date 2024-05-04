@@ -35,7 +35,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
 
 
             @Override
-            @Cacheable("searchResults")
+            //@Cacheable("searchResults")
             public List<PostDetailDto> searchFilterWithPaging(SearchFilterDto searchFilterDto) {
 
                 QPost post = QPost.post;
